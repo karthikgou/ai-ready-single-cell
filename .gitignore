@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/ai-single-cell-node/node_modules
 /.pnp
 .pnp.js
 

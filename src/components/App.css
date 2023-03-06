@@ -37,6 +37,16 @@
   }
 }
 
+
+/*
+  Common Styles
+*/
+.container {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+}
+
 /*
 Styles for header
 */
@@ -128,7 +138,7 @@ Styles for Benchmarks page
 .search-window {
   /* border: 1px solid black; */
   padding: 15px 15px 2px 15px;
-  background-color: ghostwhite;
+  background-color: lightgrey;
 }
 
 
@@ -162,5 +172,126 @@ Styles for Right Rail
 .results-window{
   border: 1px solid black;
   height: 500px;
+}
+
+svg {
+  cursor: pointer;
+}
+
+
+/*
+Styles for Login page
+*/
+
+.auth-form-container a {
+  color: #169BD5;
+  text-decoration: none;
+  font-size: small;
+}
+
+.comn-container-auth{
+    position: absolute;
+    z-index: 999;
+    left: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 50%;
+    margin-top: 100px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.comn-container-auth p {
+  margin-bottom: 30px !important;
+}
+
+.comn-container-auth h1, .comn-container-auth p {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.comn-container-auth label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.comn-container-auth input[type="checkbox"] {
+  height: 13px;
+}
+
+.comn-container-auth input{
+  display: block;
+  margin-bottom: 25px;
+  height: 35px;
+  border-radius: 6px;
+  border: 1px solid;
+  width: 100%;
+}
+
+.comn-container-auth button {
+  margin-top: 25px;
+  margin-top: 10px;
+  margin: 25px 0px 0px 80px;
+  height: 45px;
+  border-radius: 6px;
+  border: 1px solid;
+  width: 40%;
+}
+
+
+.comn-container-auth form {
+  flex-direction: column;
+}
+
+.inner-container-auth{
+  width: 40%;
+}
+
+.clear-icon {
+    position: absolute;
+    right: 12px;
+    top: 8px;
+    cursor: pointer;
+}
+.checkbox-container {
+  display: flex;
+}
+
+.checkbox-container a {
+  padding-left: 55px;
+}
+
+.checkbox-container label {
+  margin-top: -3px;
+  margin-bottom: 0px;
+}
+
+.span-class-link {
+  color: -webkit-link;
+  cursor: pointer;
+  font-size: small;
+}
+
+.checkbox {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.checkbox input[type="checkbox"] {
+  margin-right: 5px;
+  width: auto;
+}
+
+.checkbox label {
+  margin-top: -2px;
+}
+
+.checkbox span{
+  margin-left: 3rem;
 }
 

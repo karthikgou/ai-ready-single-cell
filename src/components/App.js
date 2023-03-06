@@ -19,7 +19,6 @@ import Leaderboards from './../pages/leaderboards'
 import MyData from './../pages/mydata'
 import Team from './../pages/team'
 import Docs from './../pages/docs'
-import Login from './../pages/login'
 
 
 const router = createBrowserRouter(
@@ -33,12 +32,12 @@ const router = createBrowserRouter(
       <Route path="mydata"       element={<MyData />}/>
       <Route path="team"         element={<Team />}/>
       <Route path="docs"         element={<Docs />}/>
-      <Route path="login"        element={<Login />}/>
     </Route>
   )
 )
 
 function App() {
+
   return (
     <RouterProvider router={router} />
   );
