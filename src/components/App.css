@@ -62,14 +62,14 @@ form {
   width: 100%;
 }
 
-input[type="text"] {
+/* input[type="text"] {
   border: none;
   background-color: #eee;
   padding: 10px;
   font-size: 16px;
   border-radius: 5px 0 0 5px;
   width: inherit;
-}
+} */
 
 button[type="submit"] {
   background-color: #f90;

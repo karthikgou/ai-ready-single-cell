@@ -44,9 +44,9 @@ export default function Updates() {
 
             <div className="main-content">
                 <h1>Updates from OSGB</h1>
-                {/* <h2>{user[user.length-1].Title} - {formatDate(user[user.length-1].Date_published)}</h2>
+                {/* <h2>{user[user.length-1].Title} - {formatDate(user[user.length-1].Date_published)}</h2> */}
 
-                {user.reverse().map((item,index)=>(
+                {/* {user.reverse().map((item,index)=>(
                     <div>
                         <hr/>
                         <h4>{formatDate(item.Date_published)} : {item.Title}</h4>

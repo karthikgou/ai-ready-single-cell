@@ -7,7 +7,7 @@
 ## Overview
 
 The Open Graph Benchmark (OGB) is a collection of benchmark datasets, data loaders, and evaluators for graph machine learning. Datasets cover a variety of graph machine learning tasks and real-world applications.
-The OGB data loaders are fully compatible with popular graph deep learning frameworks, including [PyTorch Geometric](https://pytorch-geometric.readthedocs.io/en/latest/) and [Deep Graph Library (DGL)](https://www.dgl.ai/). They provide automatic dataset downloading, standardized dataset splits, and unified performance evaluation.
+The OGB data loaders are fully compatible with popular graph deep learning frameworks, including [PyTorch Geometric](https://pytorch-geometric.readthedocs.io/en/latest/) and [Deep Graph Library (DGL)](https://www.dgl.ai/). They provide automatic dataset downloading, standardized dataset splits, and unified performance evaluation.</span>
 
 OGB aims to provide graph datasets that cover important graph machine learning tasks, diverse dataset scale, and rich domains.
 
