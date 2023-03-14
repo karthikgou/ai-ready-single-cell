@@ -3,7 +3,7 @@ import RightRail from "../components/rightRail";
 
 export default function Benchmarks() {
     return(
-        <div className="benchmarks-container">
+        <div className="page-container">
             <div className="left-nav">
                 
             </div>
