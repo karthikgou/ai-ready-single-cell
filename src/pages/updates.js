@@ -9,7 +9,7 @@ export default function Updates() {
 
     const fetchData = async () => {
         try {
-          const response = await axios.get('http://0.0.0.0:8055/items/updates', {
+          const response = await axios.get('http://localhost:8055/items/updates', {
             headers: {
               'Access-Control-Allow-Origin': '*'
             }
@@ -22,8 +22,6 @@ export default function Updates() {
 
     useEffect(() => {
         fetchData();
-        // console.log(user)
-        console.log(user)
     },[])
     
     function formatDate(date_given) {
@@ -44,9 +42,9 @@ export default function Updates() {
 
             <div className="main-content">
                 <h1>Updates from OSGB</h1>
-                {/* <h2>{user[user.length-1].Title} - {formatDate(user[user.length-1].Date_published)}</h2> */}
+                <h2>{user[user.length-1].Title} - {formatDate(user[user.length-1].Date_published)}</h2>
 
-                {/* {user.reverse().map((item,index)=>(
+                {user.reverse().map((item,index)=>(
                     <div>
                         <hr/>
                         <h4>{formatDate(item.Date_published)} : {item.Title}</h4>
@@ -55,7 +53,7 @@ export default function Updates() {
                         </ul>
                     </div>
 
-                ))} */}
+                ))}
             </div>
             
             <div className="right-rail">
