@@ -5,7 +5,7 @@ export default function Benchmarks() {
     return(
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                
             </div>
             <div className="main-content">
                 <h1>I'm inside Get Benchmarks page</h1>

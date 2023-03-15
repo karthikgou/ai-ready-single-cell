@@ -1,9 +1,8 @@
 import './App.css';
 import {
-  createBrowserRouter, 
-  createRoutesFromElements,
+  BrowserRouter,
   Route, 
-  RouterProvider
+  Routes
 } from 'react-router-dom'
 
 
@@ -20,26 +19,24 @@ import MyData from './../pages/mydata'
 import Team from './../pages/team'
 import Docs from './../pages/docs'
 
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<RootLayout />}>
-      <Route path='getStarted'   element={<GetStarted />} />
-      <Route path="updates"      element={<Updates />} />
-      <Route path="competitions" element={<Competitions />}/>
-      <Route path="benchmarks"   element={<Benchmarks />}/>
-      <Route path="leaderboards" element={<Leaderboards />}/>
-      <Route path="mydata"       element={<MyData />}/>
-      <Route path="team"         element={<Team />}/>
-      <Route path="docs"         element={<Docs />}/>
-    </Route>
-  )
-)
-
 function App() {
 
   return (
-    <RouterProvider router={router} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<RootLayout />}>
+          <Route path='getStarted'   element={<GetStarted/>} />
+          <Route path="updates"      element={<Updates/>} />
+          <Route path="competitions" element={<Competitions/>}/>
+          <Route path="benchmarks"   element={<Benchmarks/>}/>
+          <Route path="leaderboards" element={<Leaderboards/>}/>
+          <Route path="mydata"       element={<MyData/>}/>
+          <Route path="team"         element={<Team/>}/>
+          <Route path="docs"         element={<Docs/>}/>
+          <Route path="login"        element={<Login/>}/>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
