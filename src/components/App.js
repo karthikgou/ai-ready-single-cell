@@ -33,7 +33,6 @@ function App() {
           <Route path="mydata"       element={<MyData/>}/>
           <Route path="team"         element={<Team/>}/>
           <Route path="docs"         element={<Docs/>}/>
-          <Route path="login"        element={<Login/>}/>
         </Route>
       </Routes>
     </BrowserRouter>
