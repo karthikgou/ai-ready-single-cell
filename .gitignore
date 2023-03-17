@@ -2,8 +2,12 @@
 
 # dependencies
 /node_modules
+/ai-single-cell-node/node_modules
+/directusCMS/node_modules
+/directusCMS/uploads
 /.pnp
 .pnp.js
+package-lock.json
 
 # testing
 /coverage
