@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  react_app:
+    container_name: react_app
+    image: react_app_template
+    build: ./ai-single-cell-react
+    ports:
+      - "3000:3000"
+  node_server:
+    container_name: node_server
+    image: node_server_template
+    build:
+      context: ./ai-single-cell-node
+    ports:
+      - "3001:3001"
+    environment:
+      - EXTERNAL_PORT=3001
+      - DBUSER=root
+      - DBPASSWORD=Shirley@2410
+      - DATABASE=aisinglecell
+      - HOST=mysql_db # NAME OF THE SERVICE
+    depends_on:
+      - mysql_db
+  mysql_db:
+    container_name: mysql_db
+    build:
+      context: ./ai-single-cell-mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data: {}
