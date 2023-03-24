@@ -1,0 +1,25 @@
+# FROM ubuntu:22.04
+# RUN mkdir /var/ai-single-cell-react/
+# COPY . /var/ai-single-cell-react/
+
+# RUN apt-get -y update
+# RUN apt-get -y install curl
+# RUN apt-get -y install nodejs
+# RUN apt-get -y install npm
+# # RUN npm install react-scripts
+
+# CMD ["npm", "start", "--prefix", "/var/ai-single-cell-react/"]
+
+FROM node:14
+# Create app directory
+WORKDIR /opt/src/app
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm install
+# Copy app source code
+COPY . .
+
+#Expose port and start application
+EXPOSE 3000
+CMD ["npm", "start"]
