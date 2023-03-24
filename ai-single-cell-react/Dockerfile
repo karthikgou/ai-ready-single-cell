@@ -19,6 +19,8 @@ COPY package*.json ./
 RUN npm install
 # Copy app source code
 COPY . .
+# RUN mv -f /opt/src/app/@fortawesome /usr/src/app/node_modules/@fortawesome 
+RUN npm i -S @fortawesome/fontawesome-svg-core @fortawesome/react-fontawesome
 
 #Expose port and start application
 EXPOSE 3000
