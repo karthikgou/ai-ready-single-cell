@@ -307,8 +307,8 @@ app.get('/download', async (req, res) => {
     if (fileStat.isFile()) {
         // Download file
         const filename = path.basename(fileUrl);
-        const mimetype = mime.lookup(filePath);
-
+        const mimetype = mime.getType(filePath, { legacy: true });
+		
         res.setHeader('Content-disposition', 'attachment; filename=' + filename);
         res.setHeader('Content-type', mimetype);
 
