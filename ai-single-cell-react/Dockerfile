@@ -7,8 +7,10 @@ COPY package*.json ./
 RUN npm install
 # Copy app source code
 COPY . .
-# RUN mkdir -p /usr/src/app/node_modules/@uppy 
-# RUN mv -f /opt/src/app/@uppy/ /usr/src/app/node_modules/@uppy 
+RUN mkdir -p /usr/src/app/node_modules/@uppy 
+RUN mkdir -p /usr/src/app/node_modules/@fortawesome 
+RUN mv -f /opt/src/app/manual_deps/@uppy/ /usr/src/app/node_modules/@uppy 
+RUN mv -f /opt/src/app/manual_deps/@fortawesome/ /usr/src/app/node_modules/@fortawesome 
 # RUN npm i -S @fortawesome/fontawesome-svg-core @fortawesome/react-fontawesome
 
 
