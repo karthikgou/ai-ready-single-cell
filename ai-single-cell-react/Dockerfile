@@ -14,7 +14,7 @@ COPY . .
 # RUN mv -f /opt/src/app/manual_deps/@uppy/ /usr/src/app/node_modules/@uppy 
 # RUN mv -f /opt/src/app/manual_deps/@fortawesome/ /usr/src/app/node_modules/@fortawesome 
 RUN npm i -S @fortawesome/fontawesome-svg-core @fortawesome/react-fontawesome
-ENV HOST_IP=$(HOST_IP)
+ENV HOST=$(HOST)
 
 
 #Expose port and start application
