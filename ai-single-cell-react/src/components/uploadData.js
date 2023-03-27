@@ -22,7 +22,7 @@ export default function UploadData() {
     const [dirNames, setDirNames] = useState([]);
     const [pwd, setPwd] = useState('/');
     const [selectedItemId, setSelectedItemId] = useState(null);
-    const SERVER_URL = "node_server";
+    const SERVER_URL = "node_servererr";
     let jwtToken = getCookie('jwtToken');
     const [isNewDirOn, setIsNewDirOn] = useState(false);
 
