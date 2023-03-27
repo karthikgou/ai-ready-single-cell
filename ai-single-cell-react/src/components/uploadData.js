@@ -22,7 +22,7 @@ export default function UploadData() {
     const [dirNames, setDirNames] = useState([]);
     const [pwd, setPwd] = useState('/');
     const [selectedItemId, setSelectedItemId] = useState(null);
-    const SERVER_URL = `http://${process.env.HOST}:3001`;
+    let SERVER_URL;
     let jwtToken = getCookie('jwtToken');
     const [isNewDirOn, setIsNewDirOn] = useState(false);
 
@@ -41,6 +41,13 @@ export default function UploadData() {
     }
 
     useEffect(() => {
+	fetch('../../hostConfig.json')
+	.then(response => response.json())
+	.then(data => {
+    // Do something with the parsed JSON data
+	SERVER_URL = 'http://' + data.hostIp + ':3001';
+    console.log(data);
+  });
         fetchDirContents();
       }, [isUppyModalOpen]);
 
