@@ -8,8 +8,10 @@ services:
       - "3000:3000"
     depends_on:
       - node_server
-    environment:
-      - SERVER_URL=$$(curl -s ifconfig.me)
+    networks:
+      app-network:
+        aliases:
+          - node_server_url
   node_server:
     container_name: node_server
     image: node_server_template
@@ -27,6 +29,9 @@ services:
       - mysql_db
     volumes:
       - user_storage:/usr/src/app/storage/
+    networks:
+      app-network:
+      
   mysql_db:
     container_name: mysql_db
     build:
@@ -38,3 +43,6 @@ services:
 volumes:
   user_storage: {}
   mysql_data: {}
+
+networks:
+  app-network:
