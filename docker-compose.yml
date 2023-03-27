@@ -8,7 +8,7 @@ services:
       - "3000:3000"
     depends_on:
       - node_server
-    command: sh -c 'export SERVER_IP=$(curl -s ifconfig.me)'
+    command: "sh -c \"export SERVER_IP=$(curl -s ifconfig.me) && npm start\""
     environment:
       SERVER_IP: ${SERVER_IP}
       
