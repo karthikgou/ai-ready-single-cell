@@ -15,10 +15,7 @@ const multer = require("multer");
 const FILE_UPLOAD_MAX_SIZE = 1024 * 1024 * 1024;
 
 const app = express();
-app.use(cors({
-    origin: "http://130.127.133.163:3000",
-    credentials: true
-}));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
