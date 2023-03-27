@@ -16,7 +16,7 @@ const FILE_UPLOAD_MAX_SIZE = 1024 * 1024 * 1024;
 
 const app = express();
 app.use(cors({
-    origin: "*",
+    origin: "http://130.127.133.163:3000",
     credentials: true
 }));
 app.use(bodyParser.json());
