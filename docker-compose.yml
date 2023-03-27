@@ -8,10 +8,10 @@ services:
       - "3000:3000"
     depends_on:
       - node_server
-    networks:
-      app-network:
-        aliases:
-          - node_server_url
+    command: sh -c 'export SERVER_IP=$(curl -s ifconfig.me)'
+    environment:
+      SERVER_IP: ${SERVER_IP}
+      
   node_server:
     container_name: node_server
     image: node_server_template
@@ -29,8 +29,6 @@ services:
       - mysql_db
     volumes:
       - user_storage:/usr/src/app/storage/
-    networks:
-      app-network:
       
   mysql_db:
     container_name: mysql_db
@@ -43,6 +41,3 @@ services:
 volumes:
   user_storage: {}
   mysql_data: {}
-
-networks:
-  app-network:
