@@ -6,6 +6,8 @@ services:
     build: ./ai-single-cell-react
     ports:
       - "3000:3000"
+    depends_on:
+      - node_server    
   node_server:
     container_name: node_server
     image: node_server_template
