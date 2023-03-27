@@ -10,10 +10,10 @@ services:
       - node_server
     links:
       - node_server
-#     command: "sh -c \"export SERVER_IP=$(curl -s ifconfig.me) && npm start\""
-#     environment:
-#       SERVER_IP: ${SERVER_IP}
-      
+    networks:
+      - aisc-net
+    environment:
+      - HOST_IP=${HOST_IP}
   node_server:
     container_name: node_server
     image: node_server_template
@@ -31,7 +31,8 @@ services:
       - mysql_db
     volumes:
       - user_storage:/usr/src/app/storage/
-      
+    networks:
+      - aisc-net
   mysql_db:
     container_name: mysql_db
     build:
@@ -40,6 +41,11 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - aisc-net
 volumes:
   user_storage: {}
   mysql_data: {}
+networks:
+  aisc-net:
+    driver: bridge
