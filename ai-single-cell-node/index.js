@@ -14,13 +14,12 @@ const stat = util.promisify(fs.stat);
 const multer = require("multer");
 const FILE_UPLOAD_MAX_SIZE = 1024 * 1024 * 1024;
 
+console.log('HOSTURL: ' + process.env.HOST_URL);
 const app = express();
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-  });
+app.use(cors({
+    origin: `http://${process.env.HOST_URL}:3000`,
+    credentials: true
+}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
