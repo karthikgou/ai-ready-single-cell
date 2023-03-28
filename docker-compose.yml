@@ -8,12 +8,8 @@ services:
       - "3000:3000"
     depends_on:
       - node_server
-    links:
-      - node_server
-    networks:
-      - aisc-net
     environment:
-      - HOST_IP=${HOST_IP}
+      - HOST_URL=${HOST}
   node_server:
     container_name: node_server
     image: node_server_template
@@ -27,12 +23,12 @@ services:
       - DBPASSWORD=Shirley@2410
       - DATABASE=aisinglecell
       - HOST=mysql_db # NAME OF THE SERVICE
+      - HOST_URL=${HOST}
     depends_on:
       - mysql_db
     volumes:
       - user_storage:/usr/src/app/storage/
-    networks:
-      - aisc-net
+
   mysql_db:
     container_name: mysql_db
     build:
@@ -41,11 +37,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    networks:
-      - aisc-net
+
 volumes:
   user_storage: {}
   mysql_data: {}
-networks:
-  aisc-net:
-    driver: bridge

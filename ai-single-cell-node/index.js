@@ -15,7 +15,10 @@ const multer = require("multer");
 const FILE_UPLOAD_MAX_SIZE = 1024 * 1024 * 1024;
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: `http://${process.env.HOST_URL}:3000`,
+    credentials: true
+}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -410,6 +413,7 @@ const formatDate = (dateString) => {
 
 app.get('/getDirContents', async (req, res) => {
     try {
+        console.log(`HOSTURL: ${process.env.HOST_URL}`);
         const { dirPath } = req.query;
         const { authToken } = req.query;
 

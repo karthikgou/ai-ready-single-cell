@@ -3,7 +3,7 @@ import close_icon from '../assets/close_icon_u86.svg';
 import close_icon_hover from '../assets/close_icon_u86_mouseOver.svg';
 import { getCookie} from '../utils/utilFunctions';
 
-const LOGIN_API_URL = "http://localhost:3001";
+const LOGIN_API_URL = `http://${process.env.REACT_APP_HOST_URL}:3001`;
 
 function LoginPage (props) {
 

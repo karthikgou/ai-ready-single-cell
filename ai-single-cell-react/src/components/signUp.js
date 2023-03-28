@@ -2,7 +2,7 @@ import React , { useState }from 'react';
 import close_icon from '../assets/close_icon_u86.svg';
 import close_icon_hover from '../assets/close_icon_u86_mouseOver.svg';
 
-const SIGNUP_API_URL = 'http://localhost:3001/api/signup';
+const SIGNUP_API_URL = `http://${process.env.REACT_APP_HOST_URL}:3001/api/signup`;
 
 
 function Signup (props){
