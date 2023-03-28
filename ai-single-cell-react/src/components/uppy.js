@@ -7,7 +7,7 @@ import OneDrive from '@uppy/onedrive'
 import Dropbox from '@uppy/dropbox'
 import "@uppy/dashboard/dist/style.css"
 
-const SERVER_URL = 'http://localhost:3001';
+const SERVER_URL = "http://" + process.env.REACT_APP_HOST_URL + ":3001";
 export default function UppyUploader(props) {
     const { isUppyModalOpen, setIsUppyModalOpen, pwd, authToken } = props;
     const uppy = new Uppy({
