@@ -1,6 +1,7 @@
 import RightRail from "../components/rightRail";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import LeftNav from "../components/leftNav";
 
 const DIRECTUS_URL = "http://localhost:8055/"
 
@@ -34,7 +35,7 @@ export default function Team() {
 
     return(
         <div className="page-container">
-            <div className="left-nav">
+            <div className="left-nav border-r">
                 {/* <LeftNav /> */}
             </div>
         

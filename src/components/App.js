@@ -18,6 +18,7 @@ import Leaderboards from './../pages/leaderboards'
 import MyData from './../pages/mydata'
 import Team from './../pages/team'
 import Docs from './../pages/docs'
+import PreviewDatasets from './../pages/previewDatasets'
 
 function App() {
 
@@ -30,7 +31,8 @@ function App() {
           <Route path="competitions" element={<Competitions/>}/>
           <Route path="benchmarks"   element={<Benchmarks/>}/>
           <Route path="leaderboards" element={<Leaderboards/>}/>
-          <Route path="mydata"       element={<MyData/>}/>
+          <Route path="mydata"       element={<MyData/>}></Route>
+          <Route path="mydata/preview-datasets" element={<PreviewDatasets/>}></Route>
           <Route path="team"         element={<Team/>}/>
           <Route path="docs"         element={<Docs/>}/>
         </Route>

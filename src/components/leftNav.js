@@ -3,7 +3,9 @@ import SearchBox from "./searchBar";
 
 function LeftNav() {
   return (
-    <SearchBox />
+    <div>
+         <SearchBox />
+    </div>
   );
 }
 

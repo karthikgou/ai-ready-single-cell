@@ -1,15 +1,15 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faArrowRightArrowLeft , faPlus, faCaretDown, faPen, faDatabase, faLocationDot, faArrowsRotate, faSquareCheck, faCompress, faGear} from "@fortawesome/free-solid-svg-icons";
+import {faArrowRightArrowLeft , faPlus, faCaretDown, faPen, faDatabase, faLocationDot, faArrowsRotate, faSquareCheck, faCompress, faGear, faChevronDown, faCross, faXmark, faAngleDoubleDown} from "@fortawesome/free-solid-svg-icons";
 import SearchBox from "./searchBar";
 
 function RightRail() {
   return (
-    <div className="right-container">
-        <div className="search-window">
+    <div className="right-container border-l border-gray-100">
+        <div className="search-window border-b">
             <div className="row1-search-window rows-search-window">
                 <div className="left-side-of-container">
-                    <span><b>History</b></span>
+                    <span className="text-gray-400"><b>History</b></span>
                 </div>
                 <div className="right-side-of-container">
                     <FontAwesomeIcon icon={faPlus} />
@@ -18,11 +18,18 @@ function RightRail() {
                 </div>
             </div>
             <div className="row2-search-window rows-search-window">
-                <SearchBox />
+                {/* <SearchBox /> */}
+                <input
+                    type="text"
+                    placeholder="Search Datasets..."
+                    className="w-full dark:bg-gray-950 pl-8 form-input-alt h-9 pr-3 focus:shadow-xl"
+                />
+                <FontAwesomeIcon className="right-rail-search-svg" icon={faAngleDoubleDown} />
+                <FontAwesomeIcon className="right-rail-search-svg" icon={faXmark} />
             </div>
             <div className="row3-search-window rows-search-window">
                 <div className="left-side-of-container">
-                    <span><b>Unnamed history</b></span>
+                    <span className="text-gray-400"><b>Unnamed history</b></span>
                 </div>
                <div className="right-side-of-container">
                     <FontAwesomeIcon icon={faPen} />
@@ -30,7 +37,7 @@ function RightRail() {
             </div>
             <div className="row4-search-window rows-search-window">
                 <div className="left-side-of-container">
-                    <FontAwesomeIcon icon={faDatabase} /><span>120 B</span>
+                    <FontAwesomeIcon icon={faDatabase} /><span className="text-gray-400">120 B</span>
                  </div>
                  <div className="right-side-of-container">
                     <FontAwesomeIcon icon={faLocationDot} />

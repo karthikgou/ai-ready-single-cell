@@ -2,6 +2,7 @@ import {Outlet, NavLink} from "react-router-dom"
 import Authentication from "../components/AuthForm";
 import SearchBox from "../components/searchBar"
 import React, { useState } from "react";
+import { useSpring, animated } from 'react-spring';
 
 export default function RootLayout() {
 
@@ -28,14 +29,18 @@ export default function RootLayout() {
                 <Authentication isLoginReq={isLoginReq} handleAuth={handleAuth}/>
             </div>
             <div className ="header-container">
-                <header>
-                    <h1>OSCB</h1>
-                    <div className="header-left">
-                        <SearchBox />
-                    </div>
-                    <div className="header-right">
-                        <nav>
-                            <ul className="flex items-center">
+                <header className="border-b border-gray-100">
+                    <div class="px-4 flex h-16 items-center">
+                        <div className="flex flex-1 items-center">
+                            <a class="mr-5 flex flex-none items-center lg:mr-6" href="/"><span class="hidden whitespace-nowrap text-lg font-bold md:block">OSCB</span></a>
+                            <div className="relative flex-1 lg:max-w-sm mr-2 sm:mr-4 lg:mr-6">
+                                <SearchBox />
+                            </div>
+                        </div>
+
+                    {/* <div className="header-right"> */}
+                        <nav aria-label="Main" class="ml-auto hidden lg:block">
+                            <ul className="flex items-center space-x-2">
                                 <li data-index="0" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                     <NavLink to="getStarted" className="group flex items-center py-0.5 dark:hover:text-gray-400 hover:text-indigo-700 whitespace-nowrap" >
                                         <svg className="mr-1 text-gray-400 group-hover:text-indigo-500" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
@@ -45,11 +50,13 @@ export default function RootLayout() {
                                         </svg>
                                         Get Started
                                     </NavLink>
-                                    <div className={hoveredChildIndex === 0 ? "suboptions-container" : "suboptions-container hide"}>
-                                        <ul className="ul-suboptions">
-                                            <li><NavLink to="getStarted/benchmarks">Benchmarks</NavLink></li>
-                                            <li><NavLink to="getStarted/mydata">My Data</NavLink></li>
-                                        </ul>
+                                    <div className={hoveredChildIndex === 0 ? "suboptions-container" : "suboptions-container hide"} >
+                                        <div className="rounded-xl border-gray-100 border styles-for-dropdown">
+                                            <ul className="ul-suboptions">
+                                                <li className="hover-link"><NavLink to="getStarted/benchmarks">Benchmarks</NavLink></li>
+                                                <li><NavLink to="getStarted/mydata">My Data</NavLink></li>
+                                            </ul>
+                                        </div>
                                     </div>
                                    </li>
                                  <li data-index="1">
@@ -84,6 +91,8 @@ export default function RootLayout() {
                                         Benchmarks
                                     </NavLink>
                                     <div className={hoveredChildIndex === 3 ? "suboptions-container" : "suboptions-container hide"}>
+                                        <div className="rounded-xl border-gray-100 border styles-for-dropdown">
+
                                         <ul className="ul-suboptions">
                                             <li><NavLink to="benchmarks/overview">Overview</NavLink></li>
                                             <li><NavLink to="benchmarks/clustering">Clustering</NavLink></li>
@@ -97,6 +106,7 @@ export default function RootLayout() {
                                             <li><NavLink to="benchmarks/genes-over-condition">Genes Over Condition</NavLink></li>
                                             <li><NavLink to="benchmarks/cell-type">Cell Type</NavLink></li>
                                         </ul>
+                                    </div>
                                     </div>
                                  </li>
                                  <li data-index="4" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
@@ -118,11 +128,14 @@ export default function RootLayout() {
                                         MyData
                                     </NavLink>
                                     <div className={hoveredChildIndex === 5 ? "suboptions-container" : "suboptions-container hide"}>
+                                    <div className="rounded-xl border-gray-100 border styles-for-dropdown">
                                         <ul className="ul-suboptions">
                                             <li><NavLink to="mydata/upload-data">Upload Data</NavLink></li>
+                                            <li><NavLink to="mydata/preview-datasets">My Datasets</NavLink></li>
                                             <li><NavLink to="mydata/workflows">Workflows</NavLink></li>
                                             <li><NavLink to="mydata/tools">Tools</NavLink></li>
                                         </ul>
+                                    </div>
                                     </div>
                                  </li>
                                  <li data-index="6" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
@@ -136,10 +149,12 @@ export default function RootLayout() {
                                         Docs
                                     </NavLink>
                                     <div className={hoveredChildIndex === 6 ? "suboptions-container" : "suboptions-container hide"}>
+                                    <div className="rounded-xl border-gray-100 border styles-for-dropdown">
                                         <ul className="ul-suboptions">
                                             <li><NavLink to="docs/paper">Paper</NavLink></li>
                                             <li><NavLink to="docs/tutorial">Tutorial</NavLink></li>
                                         </ul>
+                                    </div>
                                     </div>
                                  </li>
                                  <li data-index="7">
@@ -164,6 +179,7 @@ export default function RootLayout() {
                                         Login/SignUp
                                     </NavLink>
                                     <div className={hoveredChildIndex === 8 ? "suboptions-container" : "suboptions-container hide"}>
+                                    <div className="rounded-xl border-gray-100 border styles-for-dropdown">
                                         <ul className="ul-suboptions">
                                             <li><NavLink to="login/my-projects">My Projects</NavLink></li>
                                             <li><NavLink to="login/my-data">My Data</NavLink></li>
@@ -172,6 +188,7 @@ export default function RootLayout() {
                                             <li><NavLink to="login/log-out">Log Out</NavLink></li>
 
                                         </ul>
+                                    </div>
                                     </div>
                                  </li>
                              </ul>

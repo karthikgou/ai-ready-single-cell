@@ -39,8 +39,8 @@ export default function GetStarted() {
         
         <div className="getStarted-container">
 
-            <div className="left-nav">
-                <LeftNav />
+            <div className="left-nav border-r">
+                {/* <LeftNav /> */}
             </div>
 
             <div className="main-content">
