@@ -56,7 +56,7 @@ function Signup (props){
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, username, password }),
-      // credentials: "include"
+      credentials: "include"
     })
       .then(response => response.json())
       .then(data => {
