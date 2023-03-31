@@ -11,7 +11,7 @@ COPY . .
 RUN mv -f /usr/src/app/configs/storageConfig_linux.json /usr/src/app/configs/storageConfig.json 
 RUN mv -f /usr/src/app/configs/dbconfigs_linux.json /usr/src/app/configs/dbconfigs.json 
 
-RUN chmod 600 /usr/src/app/uploads
+RUN mkdir uploads
 RUN chmod +x deploy.sh
 RUN chmod +x deploy_companion.sh
 
