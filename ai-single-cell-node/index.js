@@ -18,7 +18,7 @@ console.log('HOSTURL: ' + process.env.HOST_URL);
 const app = express();
 app.use(cors({
     origin: `http://${process.env.HOST_URL}:3000`,
-    credentials: true
+    // credentials: true
 }));
 app.use(bodyParser.json());
 app.use(cookieParser());
