@@ -21,18 +21,22 @@ export default function UppyUploader(props) {
         debug: true,
     });
     uppy.use(GoogleDrive, {
-        companionUrl: 'http://localhost:3020/companion',
+        companionUrl: 'http://localhost:3020',
     });
     uppy.use(OneDrive, {
-        companionUrl: 'http://localhost:3020/companion',
+        companionUrl: 'http://localhost:3020',
     });
     uppy.use(Dropbox, {
-        companionUrl: 'http://localhost:3020/companion',
+        companionUrl: 'http://localhost:3020',
     });
     uppy.use(XHRUpload, {
         endpoint: `${SERVER_URL}/upload?uploadDir=${pwd}&authToken=${authToken}`,
         formData: true,
         fieldName: 'files'
+    });
+    uppy.on('file-added', (file) => {
+        console.log('Upload destination:', file.meta.destination);
+        uppy.upload();
     });
     if (isUppyModalOpen)
         return (<div className="uppy-modal"><Dashboard uppy={uppy} plugins={['GoogleDrive', 'OneDrive', 'Dropbox']} /><button onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} >Close</button></div>)

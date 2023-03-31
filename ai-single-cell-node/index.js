@@ -96,7 +96,7 @@ app.post('/api/signup', (req, res) => {
             catch (err) {
                 res.json({ status: 500, message: 'Error occured while creating a storage directory for the user' });
             }
-  
+
         });
     });
 });
@@ -464,12 +464,46 @@ app.get('/getDirContents', async (req, res) => {
 
 });
 
+// app.post('/upload', async (req, res) => {
+//     let { uploadDir, authToken } = req.query;
+//     let username = getUserFromToken(authToken);
+//     let storage = multer.diskStorage({
+//         destination: (req, file, cb) => {
+//             cb(null, `${storageDir}/${username}/${uploadDir}`);
+//         },
+//         filename: (req, file, cb) => {
+//             console.log(file.originalname);
+//             cb(null, file.originalname);
+//         },
+//     });
+
+//     let uploadFiles = multer({
+//         storage: storage,
+//         limits: { fileSize: FILE_UPLOAD_MAX_SIZE },
+//     }).array("files", 10);
+
+//     let uploadFunction = util.promisify(uploadFiles);
+
+//     console.log(`${storageDir}/${username}/${uploadDir}`);
+//     try {
+//         await uploadFunction(req, res);
+//         res.status(200).json({ message: 'File uploaded successfully' });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Failed to upload file', error });
+//     }
+// });
+
+
 app.post('/upload', async (req, res) => {
     let { uploadDir, authToken } = req.query;
     let username = getUserFromToken(authToken);
+
+    let destDir = `./storage/${username}/${uploadDir}`; // Replace with your storage directory
+    let tempDir = './uploads'; // Replace with a temporary directory for uploads
+
     let storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, `${storageDir}/${username}/${uploadDir}`);
+            cb(null, tempDir);
         },
         filename: (req, file, cb) => {
             console.log(file.originalname);
@@ -484,14 +518,31 @@ app.post('/upload', async (req, res) => {
 
     let uploadFunction = util.promisify(uploadFiles);
 
-    console.log(`${storageDir}/${username}/${uploadDir}`);
     try {
         await uploadFunction(req, res);
+
+        // Move uploaded files to storage directory
+        let files = req.files;
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            let tempFilePath = path.join(tempDir, file.filename);
+            let destFilePath = path.join(destDir, file.originalname);
+
+            console.log(`Tempstorage: ${tempFilePath}, DestinationL ${destFilePath}`);
+            if (!fs.existsSync(path.join(destDir, username, uploadDir))) {
+                fs.mkdirSync(path.join(destDir, username, uploadDir), { recursive: true });
+            }
+
+            fs.copyFileSync(tempFilePath, destFilePath);
+            fs.unlinkSync(tempFilePath);
+        }
+
         res.status(200).json({ message: 'File uploaded successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Failed to upload file', error });
     }
 });
+
 
 app.post('/createNewFolder', (req, res) => {
     const { pwd, folderName, authToken } = req.query;

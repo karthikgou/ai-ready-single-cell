@@ -3,7 +3,7 @@ import { faArrowAltCircleUp, faArrowUp, faCheck, faCloudUpload, faCross, faDownl
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import './ModalWindow.css';
-import './App.css';
+// import './App.css';
 import { red } from "@mui/material/colors";
 import { getCookie } from '../utils/utilFunctions';
 import UppyUploader from "./uppy";
