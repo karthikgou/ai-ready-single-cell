@@ -13,11 +13,12 @@ const util = require('util');
 const stat = util.promisify(fs.stat);
 const multer = require("multer");
 const FILE_UPLOAD_MAX_SIZE = 1024 * 1024 * 1024;
+const hostIp = process.env.SSH_CONNECTION.split(' ')[2];
 
 console.log('HOSTURL: ' + process.env.HOST_URL);
 const app = express();
 app.use(cors({
-    origin: `http://${process.env.HOST_URL}:3000`,
+    origin: [`http://${process.env.HOST_URL}:3000`, `http://${hostIp}:3000`],
     credentials: true
 }));
 app.use(bodyParser.json());

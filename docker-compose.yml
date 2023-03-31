@@ -25,6 +25,7 @@ services:
       - DATABASE=aisinglecell
       - HOST=mysql_db # NAME OF THE SERVICE
       - HOST_URL=${HOST}
+      - SSH_CONNECTION=${SSH_CONNECTION}
     depends_on:
       - mysql_db
     volumes:
