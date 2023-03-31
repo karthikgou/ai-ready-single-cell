@@ -21,13 +21,13 @@ export default function UppyUploader(props) {
         debug: true,
     });
     uppy.use(GoogleDrive, {
-        companionUrl: 'http://localhost:3020',
+        companionUrl: `http://${process.env.REACT_APP_HOST_URL}:3020`,
     });
     uppy.use(OneDrive, {
-        companionUrl: 'http://localhost:3020',
+        companionUrl: `http://${process.env.REACT_APP_HOST_URL}:3020`,
     });
     uppy.use(Dropbox, {
-        companionUrl: 'http://localhost:3020',
+        companionUrl: `http://${process.env.REACT_APP_HOST_URL}:3020`,
     });
     uppy.use(XHRUpload, {
         endpoint: `${SERVER_URL}/upload?uploadDir=${pwd}&authToken=${authToken}`,
