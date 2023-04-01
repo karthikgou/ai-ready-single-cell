@@ -91,7 +91,7 @@ app.post('/api/signup', (req, res) => {
             }
 
             try {
-                fs.promises.mkdir(storageDir + username);
+                fs.promises.mkdir(storageDir + "/" + username);
                 res.json({ status: 200, message: 'User account created successfully' });
             }
             catch (err) {
@@ -530,8 +530,8 @@ app.post('/upload', async (req, res) => {
             let destFilePath = path.join(destDir, file.originalname);
 
             console.log(`Tempstorage: ${tempFilePath}, DestinationL ${destFilePath}`);
-            if (!fs.existsSync(path.join(destDir, username, uploadDir))) {
-                fs.mkdirSync(path.join(destDir, username, uploadDir), { recursive: true });
+            if (!fs.existsSync(path.join(destDir))) {
+                fs.mkdirSync(path.join(destDir), { recursive: true });
             }
 
             fs.copyFileSync(tempFilePath, destFilePath);

@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "required": [
+        "title",
+        "n_cells"
+    ],
+    "properties": {
+        "title": {
+            "type": "string",
+            "title": "Title"
+        },
+        "n_cells": {
+            "type": "integer",
+            "title": "Number of Cells"
+        },
+        "reference": {
+            "type": "string",
+            "title": "Reference"
+        },
+        "summary": {
+            "type": "string",
+            "title": "Summary"
+        }
+    }
+}
