@@ -1,8 +1,5 @@
 version: "3.3"
 
-networks:
-    default:
-        name: ai-single-cell
 services:
 
   oscb_mysql:
@@ -19,12 +16,16 @@ services:
             "--default-authentication-plugin=mysql_native_password",
         ]
     env_file:
-        - .env
+        - .env  
+    networks:
+      - ai-single-cell
 
       # Cache
   cache:
       container_name: oscb_cache_container
       image: redis:7.0-alpine
+      networks:
+        - ai-single-cell
 
   oscb_node:
     container_name: oscb_node_container
@@ -46,6 +47,8 @@ services:
       - oscb_mysql
     volumes:
       - user_storage:/usr/src/app/storage/
+    networks:
+      - ai-single-cell
 
   oscb_react:
     container_name: oscb_react_container
@@ -57,6 +60,8 @@ services:
       - oscb_node
     environment:
       - HOST_URL=${HOST}
+    networks:
+      - ai-single-cell
 
   directus:
     container_name: oscb_directus_container
@@ -71,6 +76,9 @@ services:
         - oscb_mysql
     env_file:
         - .env
+    networks:
+      - ai-single-cell
+  
   oscb_flask:
     build:
       context: ./ai-single-cell-flask
@@ -80,7 +88,12 @@ services:
     restart: always
     ports:
       - "5000:5000"
+    networks:
+      - ai-single-cell
 
 volumes:
   user_storage: {}
+
+networks:
+  ai-single-cell:
   
