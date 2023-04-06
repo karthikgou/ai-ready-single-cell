@@ -39,7 +39,7 @@ services:
       - DBUSER=root
       - DBPASSWORD=Shirley@2410
       - DATABASE=aisinglecell
-      - HOST=mysql_db # NAME OF THE SERVICE
+      - HOST=oscb_mysql # NAME OF THE SERVICE
       - HOST_URL=${HOST}
       - SSH_CONNECTION=${SSH_CONNECTION}
     depends_on:
