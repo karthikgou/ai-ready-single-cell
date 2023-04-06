@@ -1,8 +1,8 @@
 version: "3.3"
 
-networks:
-    default:
-        name: ai-single-cell
+# networks:
+#     default:
+#         driver: ai-single-cell
 services:
 
   oscb_mysql:
