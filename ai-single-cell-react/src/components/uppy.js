@@ -39,7 +39,7 @@ export default function UppyUploader(props) {
         uppy.upload();
     });
     if (isUppyModalOpen)
-        return (<div className="uppy-modal"><Dashboard uppy={uppy} plugins={['GoogleDrive', 'OneDrive', 'Dropbox']} /><button onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} >Close</button></div>)
+        return (<div className="uppy-modal"><Dashboard uppy={uppy} plugins={['GoogleDrive', 'OneDrive', 'Dropbox']} /><button style={{bottom: "12%", right: "26%", position: "absolute"}} onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} >Close</button></div>)
 }
 
 

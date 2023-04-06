@@ -1,14 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowAltCircleUp, faArrowUp, faCheck, faCloudUpload, faCross, faDownload, faFile, faFileUpload, faFolder, faFolderOpen, faPencil, faPlay, faPlus, faRefresh, faTrash, faTurnUp, faUpload, faVolumeXmark, faWindowClose, faXmark } from "@fortawesome/free-solid-svg-icons";
-import axios from 'axios';
+import { faArrowAltCircleUp, faCheck, faDownload, faFile, faFolder, faFolderOpen, faPencil, faPlus, faRefresh, faTrash, faTurnUp, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from 'react';
 import './ModalWindow.css';
-// import './App.css';
 import { red } from "@mui/material/colors";
 import { getCookie } from '../utils/utilFunctions';
 import UppyUploader from "./uppy";
+import Form from "@rjsf/core";
 
-
+import schema from "./uploadDataSchema.json";
+import uiSchema from "./uploadDataUISchema.json";
 
 export default function UploadData() {
     const [title, setTitle] = useState("");
@@ -25,6 +25,7 @@ export default function UploadData() {
     const SERVER_URL = "http://" + process.env.REACT_APP_HOST_URL + ":3001";
     let jwtToken = getCookie('jwtToken');
     const [isNewDirOn, setIsNewDirOn] = useState(false);
+    const [formData, setFormData] = useState({});
 
 
     const handleRenameIcon = (id) => {
@@ -42,7 +43,7 @@ export default function UploadData() {
 
     useEffect(() => {
         fetchDirContents();
-      }, [isUppyModalOpen]);
+    }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
         console.log('filesSelected: ' + selectedFiles);
@@ -179,7 +180,7 @@ export default function UploadData() {
                 if (error.message === 'Access denied. Please log in.') {
                     // display dialog box for access denied error
                     alert('Access denied. Please log in.');
-                } 
+                }
                 else if (error.message === 'File(s) being used by datasets.') {
                     alert('Unable to delete. File(s) being used by datasets.');
                 } else {
@@ -247,20 +248,30 @@ export default function UploadData() {
     }
 
     const handleSubmit = (event) => {
-
+        if (selectedFiles === undefined || selectedFiles.length === 0) {
+            window.alert('Select at least one file.');
+            return;
+        }
+        else if (jwtToken === undefined || jwtToken.length === 0) {
+            window.alert('Select at least one file.');
+            return;
+        }
+        formData['authToken'] = jwtToken;
+        formData['files'] = selectedFiles;
         fetch(`${SERVER_URL}/createDataset`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                n_cells: n_cells,
-                reference: reference,
-                summary: summary,
-                title: title,
-                files: selectedFiles,
-                authToken: jwtToken
-            })
+            // body: JSON.stringify({
+            //     n_cells: n_cells,
+            //     reference: reference,
+            //     summary: summary,
+            //     title: title,
+            //     files: selectedFiles,
+            //     authToken: jwtToken
+            // })
+            body: JSON.stringify(formData),
         })
             .then(response => {
                 if (response.status === 201) {
@@ -278,7 +289,7 @@ export default function UploadData() {
 
     return (
         <div className="main-content">
-            <h2><span>Input</span></h2>
+            <h2 style={{ textAlign: "left" }}><span>Input</span></h2>
             <div>        <div>
                 <div id="upload-data-div">
                     <b>Choose your files *</b> <br />
@@ -289,25 +300,25 @@ export default function UploadData() {
                             </div>
                         ))}
                     </div>
-                    <button type="button" onClick={toggleModal}>
+                    <button type="button" onClick={toggleModal} style={{ fontSize: "1em", padding: "10px", borderRadius: "5px" }}>
                         <FontAwesomeIcon icon={faFolderOpen} />
                     </button>
                     {isFileManagerOpen && (
                         <div className="modal">
                             <div>
-                            <button type="button" onClick={() => setIsNewDirOn(true)} style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}}>
-                                <FontAwesomeIcon icon={faPlus} /> New Folder
-                            </button> &nbsp;&nbsp;
-                            <button type="button" onClick={() => downloadFiles(selectedFiles)} style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}}>
-                                <FontAwesomeIcon icon={faDownload} /> Download
-                            </button>&nbsp;&nbsp;
-                            <button type="button" onClick={() => { deleteFiles(selectedFiles); }} style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}}>
-                                <FontAwesomeIcon icon={faTrash} color={red} /> Delete
-                            </button>&nbsp;&nbsp;
-                            <button type="button" onClick={() => { fetchDirContents() }} style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}}>
-                                <FontAwesomeIcon icon={faRefresh} color={red} /> Refresh
-                            </button></div>
-                            <div className="modal-content" style={{overflowX:"hidden", overflowY:"hidden"}}>
+                                <button type="button" onClick={() => setIsNewDirOn(true)} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                    <FontAwesomeIcon icon={faPlus} /> New Folder
+                                </button> &nbsp;&nbsp;
+                                <button type="button" onClick={() => downloadFiles(selectedFiles)} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                    <FontAwesomeIcon icon={faDownload} /> Download
+                                </button>&nbsp;&nbsp;
+                                <button type="button" onClick={() => { deleteFiles(selectedFiles); }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                    <FontAwesomeIcon icon={faTrash} color={red} /> Delete
+                                </button>&nbsp;&nbsp;
+                                <button type="button" onClick={() => { fetchDirContents() }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                    <FontAwesomeIcon icon={faRefresh} color={red} /> Refresh
+                                </button></div>
+                            <div className="modal-content" style={{ overflowX: "hidden", overflowY: "hidden" }}>
                                 <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
                                     <div style={{ paddingLeft: '18%', width: "45%" }}>Name</div>
                                     <div style={{ width: "25%" }}>Type</div>
@@ -321,7 +332,7 @@ export default function UploadData() {
                                         <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                                             <FontAwesomeIcon icon={faFolder} onClick={log} /> &nbsp;&nbsp;
                                             <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`d${index}`); }} /> &nbsp;&nbsp;
-                                            <input type='checkbox' align='center' onChange={() => pushOrPopName(pwd + '/' + dir.name)}></input>
+                                            <input type='checkbox' className="selectFiles" align='center' onChange={() => pushOrPopName(pwd + '/' + dir.name)}></input>
                                             {selectedItemId === `d${index}` ? (
                                                 <input type="text" defaultValue={dir.name} onKeyDown={(event) => {
                                                     if (event.key === 'Enter') {
@@ -342,7 +353,7 @@ export default function UploadData() {
                                             <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                                                 <FontAwesomeIcon icon={faFile} /> &nbsp;&nbsp;&nbsp;
                                                 <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`f${index}`); }} /> &nbsp;&nbsp;
-                                                <input type='checkbox' onChange={async () => { pushOrPopName(pwd + '/' + file.name); }}></input>
+                                                <input type='checkbox' className="selectFiles" onChange={async () => { pushOrPopName(pwd + '/' + file.name); }}></input>
                                                 {selectedItemId === `f${index}` ? (
                                                     <input type="text" defaultValue={file.name} onKeyDown={(event) => {
                                                         if (event.key === 'Enter') {
@@ -389,20 +400,20 @@ export default function UploadData() {
                                     </div>
                                 </div>
                             </div>
-                            <div><button onClick={() => { setPwd('/'); toggleModal(); }} style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}}><FontAwesomeIcon icon={faCheck} style={{fontWeight: "bold"}}/> Select Files</button>&nbsp;&nbsp;
-                            <button onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}}> <FontAwesomeIcon icon={faArrowAltCircleUp}/> Upload Here </button>&nbsp;&nbsp;
-                            {isUppyModalOpen && (
-                                <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken}/>
-                            )}
-                            <button style={{display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer"}} onClick={async () => {
-                                await setSelectedFiles([]); toggleModal(); setPwd('/')
-                            }} > <FontAwesomeIcon icon={faXmark} style={{fontWeight: "bold"}}/> Close</button></div>
+                            <div><button onClick={() => { setPwd('/'); toggleModal(); }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
+                                <button onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}> <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
+                                {isUppyModalOpen && (
+                                    <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} />
+                                )}
+                                <button style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }} onClick={async () => {
+                                    await setSelectedFiles([]); toggleModal(); setPwd('/')
+                                }} > <FontAwesomeIcon icon={faXmark} style={{ fontWeight: "bold" }} /> Close</button></div>
                         </div>)
                     }
                 </div>
                 <br />
-                <h2><span>Parameters</span></h2>
-                <b>Title</b><br />
+                <h2 style={{ textAlign: "left" }}><span>Parameters</span></h2>
+                {/* <b>Title</b><br />
                 <input type="text" id="title" name="title" value={title} style={{ width: "97%" }} onChange={(e) => setTitle(e.target.value)} /><br /><br />
 
                 <b>Number of Cells</b><br />
@@ -412,9 +423,16 @@ export default function UploadData() {
                 <input type="text" id="reference" name="reference" value={reference} style={{ width: "97%" }} onChange={(e) => setReference(e.target.value)} /><br /><br />
 
                 <b>Summary</b><br />
-                <textarea id="summary" name="summary" value={summary} style={{ width: "97%", height: "100px" }} onChange={(e) => setSummary(e.target.value)}></textarea><br /><br />
+                <textarea id="summary" name="summary" value={summary} style={{ width: "97%", height: "100px" }} onChange={(e) => setSummary(e.target.value)}></textarea><br /><br /> */}
 
-                <button type="submit" style={{ backgroundColor: "#3c5379", borderRadius: "5px" }} onClick={handleSubmit}><FontAwesomeIcon icon={faPlay} /> Submit</button>
+                <Form
+                    schema={schema}
+                    uischema={uiSchema}
+                    formData={formData}
+                    onChange={({ formData }) => setFormData(formData)}
+                    onSubmit={handleSubmit}
+                />
+                {/* <button type="submit" style={{ backgroundColor: "#3c5379", borderRadius: "5px" }} onClick={handleSubmit}><FontAwesomeIcon icon={faPlay} /> Submit</button> */}
 
             </div></div>
         </div >
