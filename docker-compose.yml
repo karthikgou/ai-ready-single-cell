@@ -1,18 +1,34 @@
 version: "3.3"
+
+networks:
+    default:
+        name: ai-single-cell
 services:
-  react_app:
-    container_name: react_app
-    image: react_app_template
-    build: ./ai-single-cell-react
-    ports:
-      - "3000:3000"
-    depends_on:
-      - node_server
-    environment:
-      - HOST_URL=${HOST}
-  node_server:
-    container_name: node_server
-    image: node_server_template
+
+  oscb_mysql:
+    container_name: oscb_mysql_container
+    image: oscb_mysql
+    build:
+      context: ./ai-single-cell-mysql
+    volumes:
+        - ./data:/var/lib/mysql
+    command:
+        [
+            "--character-set-server=utf8mb4",
+            "--collation-server=utf8mb4_unicode_ci",
+            "--default-authentication-plugin=mysql_native_password",
+        ]
+    env_file:
+        - .env
+
+      # Cache
+  cache:
+      container_name: oscb_cache_container
+      image: redis:7.0-alpine
+
+  oscb_node:
+    container_name: oscb_node_container
+    image: oscb_node
     build:
       context: ./ai-single-cell-node
     ports:
@@ -27,19 +43,44 @@ services:
       - HOST_URL=${HOST}
       - SSH_CONNECTION=${SSH_CONNECTION}
     depends_on:
-      - mysql_db
+      - oscb_mysql
     volumes:
       - user_storage:/usr/src/app/storage/
 
-  mysql_db:
-    container_name: mysql_db
-    build:
-      context: ./ai-single-cell-mysql
+  oscb_react:
+    container_name: oscb_react_container
+    image: oscb_react
+    build: ./ai-single-cell-react
     ports:
-      - "3306:3306"
+      - "3000:3000"
+    depends_on:
+      - oscb_node
+    environment:
+      - HOST_URL=${HOST}
+
+  directus:
+    container_name: oscb_directus_container
+    image: directus/directus:9.24.0
+    restart: unless-stopped
+    ports:
+        - 8055:8055
     volumes:
-      - mysql_data:/var/lib/mysql
+        - ./uploads:/directus/uploads
+    depends_on:
+        - cache
+        - oscb_mysql
+    env_file:
+        - .env
+  oscb_flask:
+    build:
+      context: ./ai-single-cell-flask
+      dockerfile: Dockerfile
+    container_name: oscb_flask_container
+    image: oscb_flask
+    restart: always
+    ports:
+      - "5000:5000"
 
 volumes:
   user_storage: {}
-  mysql_data: {}
+  
