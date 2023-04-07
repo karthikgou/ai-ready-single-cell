@@ -2,9 +2,12 @@
 
 # dependencies
 /ai-single-cell-react/node_modules
+/ai-single-cell-flask/flaskvenv
 /ai-single-cell-node/node_modules
 /directusCMS/node_modules
 /directusCMS/uploads
+/data
+/uploads
 /.pnp
 .pnp.js
 package-lock.json

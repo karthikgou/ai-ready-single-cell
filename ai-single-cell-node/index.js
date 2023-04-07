@@ -91,10 +91,12 @@ app.post('/api/signup', (req, res) => {
             }
 
             try {
-                fs.promises.mkdir(storageDir + "/" + username);
-                res.json({ status: 200, message: 'User account created successfully' });
+                if(!err) {
+                    fs.promises.mkdir(storageDir + username);
+                    res.json({ status: 200, message: 'User account created successfully' });
+                }          
             }
-            catch (err) {
+            catch (error) {
                 res.json({ status: 500, message: 'Error occured while creating a storage directory for the user' });
             }
 

@@ -1,5 +1,5 @@
 {
-    "host": "mysql_db",
+    "host": "oscb_mysql",
     "user": "root",
     "password": "Shirley@2410",
     "database": "aisinglecell",
