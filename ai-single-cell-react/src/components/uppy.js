@@ -6,16 +6,20 @@ import GoogleDrive from '@uppy/google-drive'
 import OneDrive from '@uppy/onedrive'
 import Dropbox from '@uppy/dropbox'
 import "@uppy/dashboard/dist/style.css"
+import "@uppy/core/dist/style.css"
+import "@uppy/progress-bar/dist/style.css"
+import "@uppy/status-bar/dist/style.css"
+import "@uppy/drag-drop/dist/style.css"
 
 const SERVER_URL = "http://" + process.env.REACT_APP_HOST_URL + ":3001";
 export default function UppyUploader(props) {
-    const { isUppyModalOpen, setIsUppyModalOpen, pwd, authToken } = props;
+    const { isUppyModalOpen, setIsUppyModalOpen, pwd, authToken, freeSpace } = props;
     const uppy = new Uppy({
         id: 'fileUploader',
         autoProceed: false,
         allowMultipleUploads: true,
         restrictions: {
-            maxFileSize: 1024 * 1024 * 1024, // 1 GB
+            maxFileSize: freeSpace * 1024 * 1024 * 1024, // 1 GB
             maxNumberOfFiles: 5,
         },
         debug: true,

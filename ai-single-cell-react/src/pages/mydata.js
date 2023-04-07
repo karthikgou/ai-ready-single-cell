@@ -1,6 +1,6 @@
 import LeftNav from "../components/leftNav";
 import RightRail from "../components/rightRail";
-import UploadData from "../components/uploadData";
+import StorageChart from "../components/storageChart";
 
 export default function MyData() {
     return(
@@ -9,7 +9,7 @@ export default function MyData() {
                 <LeftNav />
             </div>
             <div className="main-content">
-            <UploadData />
+            <StorageChart/>
             </div>
             <div className="right-rail">
                 <RightRail />

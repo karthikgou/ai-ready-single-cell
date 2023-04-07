@@ -1,3 +1,4 @@
 {
-    "storageDir": "/usr/src/app/storage/"
+    "storageDir": "/usr/src/app/storage/",
+    "storageAllowance": 5
 }

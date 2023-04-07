@@ -12,7 +12,6 @@ const archiver = require('archiver');
 const util = require('util');
 const stat = util.promisify(fs.stat);
 const multer = require("multer");
-const FILE_UPLOAD_MAX_SIZE = 1024 * 1024 * 1024;
 const hostIp = process.env.SSH_CONNECTION.split(' ')[2];
 
 console.log('HOSTURL: ' + process.env.HOST_URL);
@@ -26,8 +25,8 @@ app.use(cookieParser());
 
 const dbConfig = JSON.parse(fs.readFileSync('./configs/dbconfigs.json'));
 const storageConfig = JSON.parse(fs.readFileSync('./configs/storageConfig.json'));
+const {storageDir, storageAllowance} = storageConfig;
 
-const storageDir = storageConfig.storageDir;
 // Create a connection pool to handle multiple connections to the database
 const pool = mysql.createPool({
     host: dbConfig.host,
@@ -91,10 +90,12 @@ app.post('/api/signup', (req, res) => {
             }
 
             try {
-                fs.promises.mkdir(storageDir + "/" + username);
-                res.json({ status: 200, message: 'User account created successfully' });
+                if(!err) {
+                    fs.promises.mkdir(storageDir + username);
+                    res.json({ status: 200, message: 'User account created successfully' });
+                }          
             }
-            catch (err) {
+            catch (error) {
                 res.json({ status: 500, message: 'Error occured while creating a storage directory for the user' });
             }
 
@@ -465,34 +466,6 @@ app.get('/getDirContents', async (req, res) => {
 
 });
 
-// app.post('/upload', async (req, res) => {
-//     let { uploadDir, authToken } = req.query;
-//     let username = getUserFromToken(authToken);
-//     let storage = multer.diskStorage({
-//         destination: (req, file, cb) => {
-//             cb(null, `${storageDir}/${username}/${uploadDir}`);
-//         },
-//         filename: (req, file, cb) => {
-//             console.log(file.originalname);
-//             cb(null, file.originalname);
-//         },
-//     });
-
-//     let uploadFiles = multer({
-//         storage: storage,
-//         limits: { fileSize: FILE_UPLOAD_MAX_SIZE },
-//     }).array("files", 10);
-
-//     let uploadFunction = util.promisify(uploadFiles);
-
-//     console.log(`${storageDir}/${username}/${uploadDir}`);
-//     try {
-//         await uploadFunction(req, res);
-//         res.status(200).json({ message: 'File uploaded successfully' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Failed to upload file', error });
-//     }
-// });
 
 
 app.post('/upload', async (req, res) => {
@@ -514,7 +487,7 @@ app.post('/upload', async (req, res) => {
 
     let uploadFiles = multer({
         storage: storage,
-        limits: { fileSize: FILE_UPLOAD_MAX_SIZE },
+        // limits: { fileSize: FILE_UPLOAD_MAX_SIZE },
     }).array("files", 10);
 
     let uploadFunction = util.promisify(uploadFiles);
@@ -561,6 +534,43 @@ app.post('/createNewFolder', (req, res) => {
         res.status(404).jsonp('Bad root folder: ' + err);
     }
 })
+
+const { exec } = require('child_process');
+
+app.get('/getStorageDetails', async (req, res) => {
+    const sizeRegex = /^(\d+(\.\d+)?)\s*([KMG]B?)$/i;
+    try {
+        const { authToken } = req.query;
+
+        let username = getUserFromToken(authToken);
+        if (username === "Unauthorized") {
+            return res.status(403).jsonp(uid);
+        }
+
+        const cmd = `du -sh ${storageDir}/${username}`;
+        exec(cmd, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (stderr) {
+                console.error(stderr);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            const [size, folder] = stdout.split('\t');
+            const match = size.match(sizeRegex);
+            const [_, value, __, unit] = match;
+            const gigabytes = parseFloat(value) / ({ K: 1024 * 1024, M: 1024, G: 1 }[unit.toUpperCase()]);
+
+            console.log(`disk utilization: ${gigabytes} GB, folder: ${folder}`);
+
+            return res.json({ used: gigabytes, allowed: storageAllowance });
+        });
+    } catch (e) {
+        console.log('Error in getting Storage usage: ' + e);
+        return res.status(400).jsonp('Invalid request');
+    }
+});
 
 // Start the server
 const PORT = process.env.PORT || 3001;
