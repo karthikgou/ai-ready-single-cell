@@ -11,6 +11,8 @@
 /.pnp
 .pnp.js
 package-lock.json
+/mysql_db
+/user_storage
 
 # testing
 /coverage

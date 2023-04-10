@@ -572,6 +572,65 @@ app.get('/getStorageDetails', async (req, res) => {
     }
 });
 
+// Route to get datasets and files for a specific user
+app.get('/preview/datasets', (req, res) => {
+    
+    const { authToken } = req.query;
+    
+    const username = getUserFromToken(authToken);
+
+    if (username == "Unauthorized") {
+        return res.status(403).jsonp(username);
+    }
+    
+    // Get user ID based on username
+    const userQuery = `SELECT user_id FROM users WHERE username = '${username}'`;
+    
+    pool.query(userQuery, (err, userResult) => {
+      if (err) throw err;
+      
+      if (userResult.length === 0) {
+        res.status(404).send(`User '${username}' not found`);
+      } else {
+        const userID = userResult[0].user_id;
+        
+        // Get datasets and files for the specified user
+        const datasetsQuery = `
+          SELECT dataset.dataset_id, dataset.title, dataset.n_cells, dataset.reference, dataset.summary, file.file_id, file.file_loc, SUBSTRING_INDEX(SUBSTRING_INDEX(file.file_loc, '/', 2), '/', -1) AS direc
+          FROM dataset
+          JOIN file ON dataset.dataset_id = file.dataset_id
+          WHERE dataset.user_id = ${userID}
+        `;
+        
+        pool.query(datasetsQuery, (err, datasetsResult) => {
+          if (err) throw err;
+          
+          const datasets = {};
+  
+          datasetsResult.forEach(row => {
+            const { dataset_id, title, n_cells, reference, summary, file_id, file_loc, direc } = row;
+            if (!datasets[dataset_id]) {
+              datasets[dataset_id] = {
+                title,
+                n_cells,
+                reference,
+                summary,
+                files: [],
+                direc
+              };
+            }
+            datasets[dataset_id].files.push({
+              file_id,
+              file_loc
+            });
+          });
+  
+          res.json(datasets);
+        });
+      }
+    });
+  });
+
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

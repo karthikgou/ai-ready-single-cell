@@ -1,3 +1,5 @@
+import {LOGIN_API_URL} from '../constants/declarations'
+
 // Get the value of a cookie with a given name
 export function getCookie(name) {
     const cookies = document.cookie.split(';');
@@ -16,4 +18,32 @@ export function getCookie(name) {
     date.setTime(date.getTime() + (expiration * 24 * 60 * 60 * 1000));
     const expires = "expires=" + date.toUTCString();
     document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  }
+
+
+  export function isUserAuth(jwtToken) {
+    return new Promise((resolve, reject) => {
+      if (jwtToken) {
+        fetch(LOGIN_API_URL + "/protected", {
+          method: 'GET',
+          credentials: 'include', // send cookies with the request
+          headers: { 'Authorization': `Bearer ${jwtToken}`},
+        }) 
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.authData.username !== null && data.authData.username !== undefined) {
+            resolve({isAuth: true, username: data.authData.username});
+          } else {
+            resolve({isAuth: false, username: null});
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          reject(error);
+        });
+      } else {
+        console.error("jwtToken is missing - Please login first to continue");
+        resolve({isAuth: false, username: null});
+      }
+    });
   }

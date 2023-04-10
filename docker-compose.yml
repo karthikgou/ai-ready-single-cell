@@ -90,6 +90,8 @@ services:
       - "5000:5000"
     networks:
       - ai-single-cell
+    volumes:
+      - user_storage:/usr/src/app/storage/
 
 volumes:
   user_storage: {}

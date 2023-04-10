@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import {
   Typography,
   CircularProgress,
@@ -6,9 +6,12 @@ import {
   AccordionSummary,
   AccordionDetails
 } from '@material-ui/core';
+import { getCookie, isUserAuth } from '../utils/utilFunctions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import axios from 'axios';
 
-const FLASK_PREVIEW_DATASET_API = "http://localhost:5000/";
+const FLASK_PREVIEW_DATASET_API = `http://${process.env.REACT_APP_HOST_URL}:5000`;
+const PREVIEW_DATASETS_API = `http://${process.env.REACT_APP_HOST_URL}:3001`;
 
 export function Preview() {
   const [htmlContent, setHtmlContent] = useState('');
@@ -16,8 +19,11 @@ export function Preview() {
   const [expandedPanels, setExpandedPanels] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedHtmlContent, setLoadedHtmlContent] = useState({});
+  let jwtToken = getCookie('jwtToken');
+  const [datasets, setDatasets] = useState([]);
 
-  const handlePanelExpanded = (path) => {
+
+  const handlePanelExpanded = (path, files) => {
     if (!loadedPanels.includes(path)) {
       setIsLoading(true);
 
@@ -29,20 +35,28 @@ export function Preview() {
         setIsLoading(false);
       } else {
         // If it hasn't, make a call to the Flask API to get the HTML content
-        fetch(FLASK_PREVIEW_DATASET_API + 'preview/dataset', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path: path}),
-          })
-          .then(response => response.text())
-          .then(data => {
-            setHtmlContent(data);
-            setLoadedHtmlContent(prev => ({ ...prev, [path]: data }));
-            setIsLoading(false);
-            setExpandedPanels(prev => [...prev, { path, expanded: true }]);
-          });
+        isUserAuth(jwtToken)
+        .then((authData) => {
+          if (authData.isAuth) {
+            fetch(FLASK_PREVIEW_DATASET_API + '/preview/dataset', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ path: path, files: files, username:authData.username}),
+            })
+            .then(response => response.text())
+            .then(data => {
+              setHtmlContent(data);
+              setLoadedHtmlContent(prev => ({ ...prev, [path]: data }));
+              setIsLoading(false);
+              setExpandedPanels(prev => [...prev, { path, expanded: true }]);
+            });
+          } else {
+            console.error("Unauthorized - pLease login first to continue");
+          }
+        })
+        .catch((error) => console.error(error));
       }
       setLoadedPanels(prev => [...prev, path]);
     } else {
@@ -50,101 +64,43 @@ export function Preview() {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(PREVIEW_DATASETS_API + "/preview/datasets?authToken=" + jwtToken);
+      setDatasets(Object.values(response.data));
+    };
+    fetchData();
+  }, [jwtToken]);
+
   return (
     <div className='preview-dataset-container'>
-      <Accordion onChange={() => handlePanelExpanded("C:/Users/rajur/Downloads")}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
-          <Typography>Dataset 1</Typography><br/>
-          <Typography variant="caption">"filepath : C:/Users/rajur/Downloads"</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {isLoading ? (
-            <CircularProgress />
-          ) : (
-            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-          )}
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
-          <Typography>Dataset 2</Typography><br/>
-          <Typography variant="caption">"filepath : C:/Users/rajur/Documents"</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {expandedPanels.find(p => p.path === "C:/Users/rajur/Documents" && p.expanded) ? (
-            isLoading ? (
-              <CircularProgress />
-            ) : (
-              <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-            )
-          ) : null}
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
-          <Typography>Dataset 3</Typography><br/>
-          <Typography variant="caption">"filepath : C:/Users/rajur/Documents"</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {expandedPanels.find(p => p.path === "C:/Users/rajur/Documents" && p.expanded) ? (
-            isLoading ? (
-              <CircularProgress />
-            ) : (
-              <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-            )
-          ) : null}
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
-          <Typography>Dataset 4</Typography><br/>
-          <Typography variant="caption">"filepath : C:/Users/rajur/Documents"</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {expandedPanels.find(p => p.path === "C:/Users/rajur/Documents" && p.expanded) ? (
-            isLoading ? (
-              <CircularProgress />
-            ) : (
-              <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-            )
-          ) : null}
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
-          <Typography>Dataset 5</Typography><br/>
-          <Typography variant="caption">"filepath : C:/Users/rajur/Documents"</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {expandedPanels.find(p => p.path === "C:/Users/rajur/Documents" && p.expanded) ? (
-            isLoading ? (
-              <CircularProgress />
-            ) : (
-              <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-            )
-          ) : null}
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
-          <Typography>Dataset 6</Typography><br/>
-          <Typography variant="caption">"filepath : C:/Users/rajur/Documents"</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {expandedPanels.find(p => p.path === "C:/Users/rajur/Documents" && p.expanded) ? (
-            isLoading ? (
-              <CircularProgress />
-            ) : (
-              <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-            )
-          ) : null}
-        </AccordionDetails>
-      </Accordion>
-      </div>
+       {datasets.map(dataset => (
+        <div key={dataset.id}>
+          <Accordion key={dataset.id} onChange={() => handlePanelExpanded(dataset.direc,dataset.files)}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
+              <div className="panel-summary">
+                <h3>Title: {dataset.title}</h3>
+                <p>Reference: {dataset.reference}</p>
+                <p>Summary: {dataset.summary}</p>
+                <p>ParentDirec: {dataset.direc}</p>
+                <p>Files: </p>
+                <ul>
+                {dataset.files.map(file => (
+                  <li key={file.file_id}>{file.file_loc}</li>
+                ))}
+            </ul>
+              </div>
+            </AccordionSummary>
+            <AccordionDetails>
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+              )}
+            </AccordionDetails>
+          </Accordion> 
+          </div>
+          ))}       
+      </div>   
   )
-            };
+};

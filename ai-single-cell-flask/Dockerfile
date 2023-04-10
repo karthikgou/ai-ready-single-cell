@@ -1,48 +1,45 @@
-# FROM python:3.9-alpine
-
-# WORKDIR /app
-
-# # Install R and required packages
-# RUN apk update && \
-#     apk add --no-cache R R-dev
-
-# # Set R_HOME environment variable
-# ENV R_HOME /usr/lib/R
-
-# COPY requirements.txt .
-# # ENV RPY2_CFFI_MODE=ABI
-
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# COPY . .
-
-# CMD [ "python", "./main.py" ]
-
-
-
 FROM python:3.9-slim-buster
+
+# ENV R_LIBS=/usr/local/lib/R/site-library
+
+ENV R_LIBS_USER=/usr/local/lib/R/site-library
+
 
 # Install R and required libraries
 RUN apt-get update && \
-    apt-get install -y r-base libssl-dev libffi-dev && \
+    apt-get install -y r-base libxml2-dev libssl-dev libcurl4-openssl-dev libcairo2-dev libxt-dev libbz2-dev liblzma-dev libffi-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set up default R packages
 RUN echo "options(defaultPackages = c(getOption('defaultPackages'), 'utils', 'grDevices', 'graphics', 'stats', 'methods'))" >> /usr/lib/R/etc/Rprofile.site
 
-WORKDIR /app
+## Install base R packages
+RUN Rscript -e 'install.packages(c("BiocManager"))' && \
+   Rscript -e 'BiocManager::install()'
 
-# Install Python dependencies
-COPY requirements.txt /app/requirements.txt
+
+RUN Rscript -e 'install.packages(c("dplyr", "R.utils"))'
+
+# Install Bioconductor packages
+# RUN Rscript -e 'BiocManager::install(c("org.Hs.eg.db"))'
+
+RUN Rscript -e 'BiocManager::install(c("SingleCellExperiment" , "EnsDb.Hsapiens.v86", "scater", "AnnotationDbi", "org.Hs.eg.db", "org.Mm.eg.db"))'
+
+# Set the default library location to /usr/local/lib/R/site-library
+# RUN echo ".libPaths(c('/usr/local/lib/R/site-library', .libPaths()))" > /usr/local/lib/R/etc/Rprofile.site
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the Flask app
+COPY . .
+
+# Set the FLASK_APP environment variable
+ENV FLASK_APP=main.py
+
+# Expose port 5000 for the Flask application to listen on
 EXPOSE 5000
 
-# Copy the application code to the container
-COPY . /app
-
-# Start the Flask app
-CMD ["python", "main.py"]
-
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

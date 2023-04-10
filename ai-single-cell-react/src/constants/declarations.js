@@ -1,0 +1,1 @@
+export const LOGIN_API_URL = `http://${process.env.REACT_APP_HOST_URL}:3001`;
