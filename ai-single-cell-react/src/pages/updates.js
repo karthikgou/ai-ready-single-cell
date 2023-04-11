@@ -17,6 +17,7 @@ export default function Updates() {
             }
           });
           console.log(response.data);
+          setUser(response.data);
         } catch (error) {
           console.error(error);
         }
