@@ -8,7 +8,6 @@ import UppyUploader from "./uppy";
 import Form from "@rjsf/core";
 
 import schema from "./uploadDataSchema.json";
-import uiSchema from "./uploadDataUISchema.json";
 import RightRail from "./rightRail";
 import LeftNav from "./leftNav";
 
@@ -26,6 +25,8 @@ export default function UploadData() {
     const [formData, setFormData] = useState({});
     const [usedStorage, setUsedStorage] = useState(0);
     const [totalStorage, setTotalStorage] = useState(1);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+    const [enabledCheckboxes, setEnabledCheckboxes] = useState([]);
 
     const handleRenameIcon = (id) => {
         fileNames.map((item, index) => {
@@ -39,6 +40,23 @@ export default function UploadData() {
             }
         });
     }
+
+    const SubmitButton = ({ disabled, onClick }) => {
+        const handleClick = () => {
+            setIsButtonDisabled(true);
+            onClick();
+        };
+
+        return (
+            <button
+                type="submit"
+                onClick={handleClick}
+                disabled={isButtonDisabled || disabled}
+            >
+                Submit
+            </button>
+        );
+    };
 
     useEffect(() => {
         getStorageDetails();
@@ -75,6 +93,7 @@ export default function UploadData() {
     const toggleModal = async () => {
         await setIsFileManagerOpen(!isFileManagerOpen);
 
+
         if (!isFileManagerOpen) {
             setSelectedFiles([]);
             fetchDirContents();
@@ -109,6 +128,11 @@ export default function UploadData() {
 
 
     const fetchDirContents = async (subdir) => {
+
+        enabledCheckboxes.forEach((checkboxId) => {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = false;
+        });
 
         let newDir = ''
         jwtToken = getCookie('jwtToken');
@@ -303,6 +327,10 @@ export default function UploadData() {
                 alert('Error creating dataset.');
                 console.error('Error creating dataset:', error);
             });
+        setIsButtonDisabled(true);
+        setTimeout(() => {
+            setIsButtonDisabled(false);
+        }, 5000);
     };
 
     return (
@@ -355,7 +383,7 @@ export default function UploadData() {
                                                 <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                                                     <FontAwesomeIcon icon={faFolder} onClick={log} /> &nbsp;&nbsp;
                                                     <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`d${index}`); }} /> &nbsp;&nbsp;
-                                                    <input type='checkbox' className="selectFiles" align='center' onChange={() => pushOrPopName(pwd + '/' + dir.name)}></input>
+                                                    <input type='checkbox' id={`dirCheckbox${index + 1}`} className="selectFiles" align='center' onChange={() => { setEnabledCheckboxes([...enabledCheckboxes, `dirCheckbox${index + 1}`]); pushOrPopName(pwd + '/' + dir.name) }}></input>
                                                     {selectedItemId === `d${index}` ? (
                                                         <input type="text" defaultValue={dir.name} onKeyDown={(event) => {
                                                             if (event.key === 'Enter') {
@@ -376,7 +404,7 @@ export default function UploadData() {
                                                     <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                                                         <FontAwesomeIcon icon={faFile} /> &nbsp;&nbsp;&nbsp;
                                                         <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`f${index}`); }} /> &nbsp;&nbsp;
-                                                        <input type='checkbox' className="selectFiles" onChange={async () => { pushOrPopName(pwd + '/' + file.name); }}></input>
+                                                        <input type='checkbox' id={`fileCheckbox${index + 1}`} className="selectFiles" onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `fileCheckbox${index + 1}`]); pushOrPopName(pwd + '/' + file.name); }}></input>
                                                         {selectedItemId === `f${index}` ? (
                                                             <input type="text" defaultValue={file.name} onKeyDown={(event) => {
                                                                 if (event.key === 'Enter') {
@@ -436,12 +464,14 @@ export default function UploadData() {
                         </div>
                         <br />
                         <h2 style={{ textAlign: "left" }}><span>Parameters</span></h2>
+
+
                         <Form
                             schema={schema}
-                            uischema={uiSchema}
                             formData={formData}
                             onChange={({ formData }) => setFormData(formData)}
                             onSubmit={handleSubmit}
+                            SubmitButton={SubmitButton}
                         />
 
                     </div></div>

@@ -140,12 +140,31 @@ div.scroll {
   cursor: pointer;
 }
 
-input,
+/* input,
 textarea {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+  width: 100%;
+} */
+
+#root_title,
+#root_n_cells,
+#root_reference {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+#root_summary {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  resize: vertical;
   width: 100%;
 }
 

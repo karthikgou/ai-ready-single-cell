@@ -7,19 +7,24 @@
     "properties": {
         "title": {
             "type": "string",
-            "title": "Title"
+            "title": "Title",
+            "classNames": "form__title"
         },
         "n_cells": {
             "type": "integer",
-            "title": "Number of Cells"
+            "title": "Number of Cells",
+            "classNames": "form__cells"
         },
         "reference": {
             "type": "string",
-            "title": "Reference"
+            "title": "Reference",
+            "classNames": "form__reference"
         },
         "summary": {
             "type": "string",
-            "title": "Summary"
+            "title": "Summary",
+            "classNames": "form__summary",
+            "format": "textarea"
         }
     }
 }
