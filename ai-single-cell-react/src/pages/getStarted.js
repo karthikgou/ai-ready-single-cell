@@ -13,14 +13,14 @@ export default function GetStarted() {
     useEffect(() => {
         async function fetchFileData() {
         try {
-            const response = await axios.get(DIRECTUS_URL + "items/filemappings?filter[filename]=getstarted");
+            const response = await axios.get(DIRECTUS_URL + "/items/filemappings?filter[filename]=getstarted");
             const data = response.data.data;
             
             if(data.length === 1) {
                 const fileMappingObject = data[0];
                 const fileID = fileMappingObject.fileID;
                 if(fileID !== null) {
-                    fetch(DIRECTUS_URL + "assets/" + fileID)
+                    fetch(DIRECTUS_URL + "/assets/" + fileID)
                     .then(response => response.text())
                     .then(data => setMarkdownText(data))
                     .catch(error => console.error('Error retrieving markdown:', error));

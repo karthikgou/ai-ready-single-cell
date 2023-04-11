@@ -12,12 +12,12 @@ export default function Team() {
 
   useEffect(() => {
     async function fetchTeamData() {
-      const response = await axios.get(DIRECTUS_URL + "items/team");
+      const response = await axios.get(DIRECTUS_URL + "/items/team");
       const teamMembers = response.data.data;
       const core_team = [];
       const steering_committee = [];
       for (const member of teamMembers) {
-        member.imageUrl = DIRECTUS_URL + "assets/" + member.image;
+        member.imageUrl = DIRECTUS_URL + "/assets/" + member.image;
         if(member.team_type === "core development") {
             core_team.push(member);
         } else if (member.team_type === "steering committee") {
