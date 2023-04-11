@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import LeftNav from "../components/leftNav";
 
-const DIRECTUS_URL = "http://localhost:8055/"
+const DIRECTUS_URL = `http://${process.env.REACT_APP_HOST_URL}:8055`
 
 export default function Team() {
 
