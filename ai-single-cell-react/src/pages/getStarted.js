@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown"
 import LeftNav from "../components/leftNav";
 import RightRail from "../components/rightRail";
 
-const DIRECTUS_URL = "http://localhost:8055/"
+const DIRECTUS_URL = `http://${process.env.REACT_APP_HOST_URL}:8055`
 
 
 export default function GetStarted() {

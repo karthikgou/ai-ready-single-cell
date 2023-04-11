@@ -3,13 +3,15 @@ import axios from "axios";
 import LeftNav from "../components/leftNav";
 import RightRail from "../components/rightRail";
 
+const UPDATES_PAGE_API = `http://${process.env.REACT_APP_HOST_URL}:8055`
+
 export default function Updates() {
 
     const [user,setUser] = useState([]);
 
     const fetchData = async () => {
         try {
-          const response = await axios.get('http://localhost:8055/items/updates', {
+          const response = await axios.get(UPDATES_PAGE_API + '/items/updates', {
             headers: {
               'Access-Control-Allow-Origin': '*'
             }
