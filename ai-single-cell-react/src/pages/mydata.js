@@ -16,7 +16,7 @@ export default function MyData() {
     else return(
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
             <StorageChart/>
