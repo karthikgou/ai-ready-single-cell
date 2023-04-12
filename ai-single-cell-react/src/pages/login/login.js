@@ -1,18 +1,16 @@
-// import LeftNav from "../components/leftNav";
-import RightRail from "../components/rightRail";
-import StorageChart from "../components/storageChart";
+import LoginPage from "../../components/logIn";
 
-export default function MyData() {
+export default function Login(props) {
     return(
         <div className="page-container">
             <div className="left-nav">
                 {/* <LeftNav /> */}
             </div>
             <div className="main-content">
-            <StorageChart/>
+                <LoginPage userStates={props.isUserLoggedIn} functions={props.handleLoginClick}/>
             </div>
             <div className="right-rail">
-                <RightRail />
+                {/* <RightRail /> */}
             </div>
         </div>
     )

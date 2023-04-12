@@ -1,17 +1,16 @@
-import LeftNav from "../components/leftNav";
-import RightRail from "../components/rightRail";
+import Signup from "../../components/signUp";
 
 export default function Login() {
     return(
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
-                <h1>I'm inside login page</h1>
+                <Signup />
             </div>
             <div className="right-rail">
-                <RightRail />
+                {/* <RightRail /> */}
             </div>
         </div>
     )

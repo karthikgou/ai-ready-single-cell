@@ -11,7 +11,13 @@ import schema from "./uploadDataSchema.json";
 import RightRail from "./rightRail";
 import LeftNav from "./leftNav";
 
+import { useNavigate } from 'react-router-dom';
+
+
 export default function UploadData() {
+
+    const navigate = useNavigate();
+
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
     const [isUppyModalOpen, setIsUppyModalOpen] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -336,7 +342,7 @@ export default function UploadData() {
     return (
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
                 <div className="main-content">

@@ -1,12 +1,18 @@
 import {Outlet, NavLink} from "react-router-dom"
 import Authentication from "../components/AuthForm";
 import SearchBox from "../components/searchBar"
-import React, { useState } from "react";
-import { useSpring, animated } from 'react-spring';
+import React, { useState, useEffect } from "react";
+import { deleteCookie, getCookie } from "../utils/utilFunctions";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function RootLayout() {
 
+    const navigate = useNavigate();
+
     const [isLoginReq, setIsLoginReq] = useState(false);
+
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
     const handleAuth = (event) => {
         event.preventDefault();
@@ -22,6 +28,46 @@ export default function RootLayout() {
     const handleMouseOut = () => {
       setHoveredChildIndex(null);
     };
+
+    const handleLogoutClick = () => {
+        if(deleteCookie('jwtToken'))
+        setIsUserLoggedIn(false);
+        navigate('/');
+        window.location.reload();  
+        
+    }
+
+    const handleLoginClick = () => {
+        setIsUserLoggedIn(true);
+    }
+
+    useEffect(() => {
+        const userCookie = getCookie('jwtToken');
+
+        if(userCookie!== '') {
+            setIsUserLoggedIn(true);
+        }
+        
+      }, [isUserLoggedIn]);
+
+    // useEffect(() => {
+    //     const handleCookieChange = () => {
+    //       const newCookieValue = document.cookie
+    //         .split('; ')
+    //         .find(row => row.startsWith('jwtToken='))
+    //         ?.split('=')[1];
+    
+    //       setIsUserLoggedIn(Boolean(newCookieValue));
+    //     };
+    
+    //     // Listen for changes to the cookie value
+    //     window.addEventListener('change', handleCookieChange);
+    
+    //     // Clean up the event listener when the component unmounts
+    //     return () => {
+    //       window.removeEventListener('change', handleCookieChange);
+    //     };
+    //   }, []);
   
     return(
         <div className="container">
@@ -168,7 +214,7 @@ export default function RootLayout() {
                                         Teams
                                     </NavLink>
                                  </li>
-                                 <li data-index="8" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} onClick={handleAuth}>
+                                 <li data-index="8" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                     <NavLink className="group flex items-center py-0.5 dark:hover:text-gray-400 hover:text-indigo-700">
                                         <svg className="mr-1 text-gray-400 group-hover:text-red-500" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 25 25">
                                             <ellipse cx="12.5" cy="5" fill="currentColor" fillOpacity="0.25" rx="7.5" ry="2"></ellipse>
@@ -185,7 +231,11 @@ export default function RootLayout() {
                                             <li><NavLink to="login/my-data">My Data</NavLink></li>
                                             <li><NavLink to="login/reports">Reports</NavLink></li>
                                             <li><NavLink to="login/security">Security</NavLink></li>
-                                            <li><NavLink to="login/log-out">Log Out</NavLink></li>
+                                            {isUserLoggedIn ? (
+                                                <li><span onClick={handleLogoutClick}>Log Out</span></li>
+                                            ) : (
+                                                <li><NavLink to="login" userStates={{ isUserLoggedIn }} functions={{ handleLoginClick }}>Log In</NavLink></li>
+                                            )}
 
                                         </ul>
                                     </div>
