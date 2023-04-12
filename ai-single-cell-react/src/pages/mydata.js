@@ -1,4 +1,4 @@
-import LeftNav from "../components/leftNav";
+// import LeftNav from "../components/leftNav";
 import RightRail from "../components/rightRail";
 import StorageChart from "../components/storageChart";
 import { getCookie } from "../utils/utilFunctions";
