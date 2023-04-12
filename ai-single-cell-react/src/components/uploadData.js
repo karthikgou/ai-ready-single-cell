@@ -15,6 +15,7 @@ import LeftNav from "./leftNav";
 export default function UploadData() {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
     const [isUppyModalOpen, setIsUppyModalOpen] = useState(false);
+    const [fileListBuffer, setFileListBuffer] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [fileNames, setFileNames] = useState([]);
     const [dirNames, setDirNames] = useState([]);
@@ -46,13 +47,13 @@ export default function UploadData() {
     }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
-        console.log('filesSelected: ' + selectedFiles);
+        console.log('filesSelected: ' + fileListBuffer);
         name = name.replace("//", "/");
-        if (!selectedFiles.includes(name)) {
-            selectedFiles.push(name);
+        if (!fileListBuffer.includes(name)) {
+            fileListBuffer.push(name);
         }
         else
-            selectedFiles.pop(name)
+            fileListBuffer.pop(name)
     }
 
     const handleUpdateText = (id, newText) => {
@@ -75,8 +76,11 @@ export default function UploadData() {
     const toggleModal = async () => {
         await setIsFileManagerOpen(!isFileManagerOpen);
 
+        setSelectedFiles(fileListBuffer);
+
         if (!isFileManagerOpen) {
             setSelectedFiles([]);
+            setFileListBuffer([]);
             fetchDirContents();
         }
     }
