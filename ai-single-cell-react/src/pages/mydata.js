@@ -3,17 +3,20 @@ import RightRail from "../components/rightRail";
 import StorageChart from "../components/storageChart";
 import { getCookie } from "../utils/utilFunctions";
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function MyData() {
 
     const navigate = useNavigate();
-    let jwtToken = getCookie('jwtToken');
 
-    if(jwtToken===undefined || jwtToken === '') {
-        navigate('/routing');
-    }
+    useEffect(() => {
+        let jwtToken = getCookie('jwtToken');
+        if(jwtToken===undefined || jwtToken === '') {
+            navigate('/routing');
+        }
+    },[]);
 
-    else return(
+    return(
         <div className="page-container">
             <div className="left-nav">
                 {/* <LeftNav /> */}
