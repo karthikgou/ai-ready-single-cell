@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleUp, faCheck, faDownload, faFile, faFolder, faFolderOpen, faPencil, faPlus, faRefresh, faTrash, faTurnUp, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ModalWindow.css';
 import { red } from "@mui/material/colors";
 import { getCookie } from '../utils/utilFunctions';
@@ -9,15 +10,8 @@ import Form from "@rjsf/core";
 
 import schema from "./uploadDataSchema.json";
 import RightRail from "./rightRail";
-import LeftNav from "./leftNav";
-
-import { useNavigate } from 'react-router-dom';
-
 
 export default function UploadData() {
-
-    const navigate = useNavigate();
-
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
     const [isUppyModalOpen, setIsUppyModalOpen] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -33,6 +27,7 @@ export default function UploadData() {
     const [totalStorage, setTotalStorage] = useState(1);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [enabledCheckboxes, setEnabledCheckboxes] = useState([]);
+    const navigate = useNavigate();
 
     const handleRenameIcon = (id) => {
         fileNames.map((item, index) => {
@@ -123,7 +118,7 @@ export default function UploadData() {
             })
             .catch(error => {
                 if (!errorHandled && error.message === 'Please log in first') {
-                    window.alert('Please log in first');
+                    navigate('/routing');
                     return;
                 } else {
                     console.error(error);
@@ -165,7 +160,7 @@ export default function UploadData() {
             .catch(error => {
                 setIsFileManagerOpen(false);
                 if (error.message === 'Please log in first') {
-                    window.alert('Please log in first');
+                    navigate('/routing');
                 } else {
                     console.error(error);
                 }
@@ -209,7 +204,8 @@ export default function UploadData() {
             .catch(error => {
                 if (error.message === 'Access denied. Please log in.') {
                     // display dialog box for access denied error
-                    alert('Access denied. Please log in.');
+                    // alert('Access denied. Please log in.');
+                    navigate('/routing');
                 }
                 else if (error.message === 'File(s) being used by datasets.') {
                     alert('Unable to delete. File(s) being used by datasets.');
@@ -234,7 +230,7 @@ export default function UploadData() {
             })
             .catch(error => {
                 if (error.message === 'Please log in first') {
-                    window.alert('Please log in first');
+                    navigate('/routing');
                 } else {
                     console.error(error);
                 }
@@ -339,7 +335,11 @@ export default function UploadData() {
         }, 5000);
     };
 
-    return (
+    if (jwtToken === '' || jwtToken === undefined) {
+        navigate("/routing");
+    }
+
+    else return (
         <div className="page-container">
             <div className="left-nav">
                 {/* <LeftNav /> */}
@@ -429,7 +429,7 @@ export default function UploadData() {
                                                         <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
                                                     </div>
                                                 ))}
-                                                {isNewDirOn && (<div class="modal-item"><input type="text" defaultValue="New Folder" onKeyDown={(event) => {
+                                                {isNewDirOn && (<div className="modal-item"><input type="text" defaultValue="New Folder" onKeyDown={(event) => {
                                                     if (event.key === 'Enter') {
                                                         fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${event.target.value}&authToken=${jwtToken}`, {
                                                             method: 'POST',
@@ -446,7 +446,7 @@ export default function UploadData() {
                                                                 return response.json();
                                                             })
                                                             .catch(error => {
-                                                                window.alert('Please log in first');
+                                                                navigate('/routing');
                                                                 console.error(error);
                                                                 return;
                                                             });
