@@ -39,11 +39,9 @@ export function getCookie(name) {
         })
         .catch((error) => {
           console.error(error);
-          reject(error);
+          // reject(error);
+          resolve({isAuth: false, username: null});
         });
-      } else {
-        console.error("jwtToken is missing - Please login first to continue");
-        resolve({isAuth: false, username: null});
       }
     });
   }

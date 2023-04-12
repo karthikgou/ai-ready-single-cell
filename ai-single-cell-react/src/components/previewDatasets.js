@@ -9,11 +9,14 @@ import {
 import { getCookie, isUserAuth } from '../utils/utilFunctions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const FLASK_PREVIEW_DATASET_API = `http://${process.env.REACT_APP_HOST_URL}:5000`;
 const PREVIEW_DATASETS_API = `http://${process.env.REACT_APP_HOST_URL}:3001`;
 
 export function Preview() {
+
+  const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState('');
   const [loadedPanels, setLoadedPanels] = useState([]);
   const [expandedPanels, setExpandedPanels] = useState([]);
@@ -35,6 +38,13 @@ export function Preview() {
         setIsLoading(false);
       } else {
         // If it hasn't, make a call to the Flask API to get the HTML content
+
+        // If user is not logged In - navigate to login page
+        if(jwtToken === null || jwtToken === undefined || jwtToken === '') {
+          navigate("/routing");
+        }
+
+        // Else verify the authenticity of the user
         isUserAuth(jwtToken)
         .then((authData) => {
           if (authData.isAuth) {
@@ -53,7 +63,8 @@ export function Preview() {
               setExpandedPanels(prev => [...prev, { path, expanded: true }]);
             });
           } else {
-            console.error("Unauthorized - pLease login first to continue");
+            console.warn("Unauthorized - pLease login first to continue");
+            navigate("/routing");
           }
         })
         .catch((error) => console.error(error));
@@ -65,12 +76,16 @@ export function Preview() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get(PREVIEW_DATASETS_API + "/preview/datasets?authToken=" + jwtToken);
-      setDatasets(Object.values(response.data));
-    };
-    fetchData();
-  }, [jwtToken]);
+    if(jwtToken) {
+      const fetchData = async () => {
+        const response = await axios.get(PREVIEW_DATASETS_API + "/preview/datasets?authToken=" + jwtToken);
+        setDatasets(Object.values(response.data));
+      };
+      fetchData();
+    } else {
+      navigate("/routing");
+    }
+  }, [jwtToken, navigate]);
 
   return (
     <div className='preview-dataset-container'>
