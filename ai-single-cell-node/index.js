@@ -164,8 +164,8 @@ app.get('/protected', verifyToken, (req, res) => {
     });
 });
 
-
 app.post('/createDataset', (req, res) => {
+
     const { title, n_cells, reference, summary, authToken, files } = req.body;
     const username = getUserFromToken(authToken);
 
@@ -193,39 +193,74 @@ app.post('/createDataset', (req, res) => {
                     return;
                 }
 
+
                 // Run INSERT command
+                // connection.query('INSERT INTO dataset (title, n_cells, reference, summary, user_id) VALUES (?, ?, ?, ?, ?)', [title, n_cells, reference, summary, userId], function (err, datasetResult) {
+                //     if (err) {
+                //         connection.rollback(function () {
+                //             throw err;
+                //         });
+                //     }
+
+                //     if(datasetResult === undefined) {
+                //         return res.status(400).jsonp('Bad request');
+                //     }
+                //     const datasetId = datasetResult.insertId;
+
+                //     for (const file of files) {
+                //         connection.query('INSERT INTO file (file_loc, dataset_id) VALUES (?, ?)', [file, datasetId]);
+                //     }
+
+                //     // Commit transaction
+                //     connection.commit(function (err) {
+                //         if (err) {
+                //             connection.rollback(function () {
+                //                 throw err;
+                //             });
+                //         }
+
+                //         console.log('Transaction completed successfully');
+                //         connection.release();
+                //         res.status(201).jsonp('Dataset Created.');
+                //     });
+                // });
                 connection.query('INSERT INTO dataset (title, n_cells, reference, summary, user_id) VALUES (?, ?, ?, ?, ?)', [title, n_cells, reference, summary, userId], function (err, datasetResult) {
                     if (err) {
-                        connection.rollback(function () {
-                            throw err;
-                        });
-                    }
-
-                    const datasetId = datasetResult.insertId;
-
-                    for (const file of files) {
-                        connection.query('INSERT INTO file (file_loc, dataset_id) VALUES (?, ?)', [file, datasetId]);
-                    }
-
-                    // Commit transaction
-                    connection.commit(function (err) {
-                        if (err) {
+                        if (err.code === 'ER_DUP_ENTRY') {
+                            console.log('Duplicate Record');
+                            connection.release();
+                            return res.status(400).send('Dataset title already exists');
+                        } else {
                             connection.rollback(function () {
                                 throw err;
                             });
                         }
+                    } else {
+                        const datasetId = datasetResult.insertId;
 
-                        console.log('Transaction completed successfully');
-                        connection.release();
-                        res.status(201).jsonp('Dataset Created.');
-                    });
+                        for (const file of files) {
+                            connection.query('INSERT INTO file (file_loc, dataset_id) VALUES (?, ?)', [file, datasetId]);
+                        }
+
+                        // Commit transaction
+                        connection.commit(function (err) {
+                            if (err) {
+                                connection.rollback(function () {
+                                    throw err;
+                                });
+                            }
+
+                            console.log('Transaction completed successfully');
+                            connection.release();
+                            res.status(201).jsonp('Dataset Created.');
+                        });
+                    }
                 });
+
             });
         });
     });
 });
-
-
 
 app.post('/renameFile', async (req, res) => {
     let { oldName } = req.query;
