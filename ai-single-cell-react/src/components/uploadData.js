@@ -306,6 +306,28 @@ export default function UploadData() {
 
     }
 
+    function createNewFolder(folderName) {
+        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${folderName}&authToken=${jwtToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (response.status === 403) {
+                    throw new Error('Please log in first');
+                }
+                setIsNewDirOn(false);
+                fetchDirContents();
+                return response.json();
+            })
+            .catch(error => {
+                navigate('/routing');
+                console.error(error);
+                return;
+            });
+    }
+
     const handleSubmit = (event) => {
         if (selectedFiles === undefined || selectedFiles.length === 0) {
             setErrorMessage('Select at least one file.');
@@ -407,6 +429,8 @@ export default function UploadData() {
                                                             if (event.key === 'Enter') {
                                                                 handleUpdateText(`d${index}`, event.target.value);
                                                             }
+                                                        }} onBlur={(event) => {
+                                                            handleUpdateText(`d${index}`, event.target.value);
                                                         }}
                                                             autoFocus
                                                         />
@@ -441,31 +465,23 @@ export default function UploadData() {
                                                         <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
                                                     </div>
                                                 ))}
-                                                {isNewDirOn && (<div className="modal-item"><input type="text" defaultValue="New Folder" onKeyDown={(event) => {
-                                                    if (event.key === 'Enter') {
-                                                        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${event.target.value}&authToken=${jwtToken}`, {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json'
-                                                            },
-                                                        })
-                                                            .then(response => {
-                                                                if (response.status === 403) {
-                                                                    throw new Error('Please log in first');
+                                                {isNewDirOn && (
+                                                    <div className="modal-item">
+                                                        <input
+                                                            type="text"
+                                                            defaultValue="New Folder"
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === 'Enter') {
+                                                                    createNewFolder(event.target.value);
                                                                 }
-                                                                setIsNewDirOn(false);
-                                                                fetchDirContents();
-                                                                return response.json();
-                                                            })
-                                                            .catch(error => {
-                                                                navigate('/routing');
-                                                                console.error(error);
-                                                                return;
-                                                            });
-                                                    }
-                                                }}
-                                                    autoFocus
-                                                /></div>)}
+                                                            }}
+                                                            onBlur={(event) => {
+                                                                createNewFolder(event.target.value);
+                                                            }}
+                                                            autoFocus
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
