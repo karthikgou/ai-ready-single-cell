@@ -99,22 +99,22 @@ function Signup (props){
         <form onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email">Email:</label>
-            <input type="email" id="email" name="email" value={formData.email} className="form-input" onChange={handleChange}  placeholder="Email"/>
+            <input type="email" id="email" name="email" value={formData.email} className="form-input" onChange={handleChange}  autoComplete="email" placeholder="Email"/>
             {errors.email && <span className="error">{errors.email}</span>}
           </div>
           <div>
             <label htmlFor="username">Username:</label>
-            <input type="text" name="username" id="username" value={formData.username} className="form-input" onChange={handleChange} placeholder="Username" />
+            <input type="text" name="username" id="username" value={formData.username} className="form-input" autoComplete="username" onChange={handleChange} placeholder="Username" />
             {errors.username && <span className="error">{errors.username}</span>}
           </div>
           <div>
             <label htmlFor="password">Password:</label>
-            <input type="password" id="password" name="password" value={formData.password} className="form-input" onChange={handleChange} placeholder="Password" />
+            <input type="password" id="password" name="password" value={formData.password} className="form-input" autoComplete="new-password" onChange={handleChange} placeholder="Password" />
             {errors.password && <span className="error">{errors.password}</span>}
           </div>
           <div>
             <label htmlFor="confirmPassword">Confirm Password:</label>
-            <input type="password" name="confirmPassword" id="confirmPassword" value={formData.confirmPassword} className="form-input" onChange={handleChange} placeholder="Confirm Password"/>
+            <input type="password" name="confirmPassword" id="confirmPassword" value={formData.confirmPassword} autoComplete="new-password" className="form-input" onChange={handleChange} placeholder="Confirm Password"/>
             {errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
           </div>
           <button type="submit" className='btn-widget'>Signup</button>
