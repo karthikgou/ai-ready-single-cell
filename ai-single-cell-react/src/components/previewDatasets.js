@@ -15,12 +15,13 @@ const FLASK_PREVIEW_DATASET_API = `http://${process.env.REACT_APP_HOST_URL}:5000
 const PREVIEW_DATASETS_API = `http://${process.env.REACT_APP_HOST_URL}:3001`;
 
 export function Preview(props) {
+
+  const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState('');
   const [loadedPanels, setLoadedPanels] = useState([]);
   const [expandedPanels, setExpandedPanels] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedHtmlContent, setLoadedHtmlContent] = useState({});
-  const navigate = useNavigate();
   let jwtToken = getCookie('jwtToken');
   const [datasets, setDatasets] = useState([]);
   let { message } = props;
@@ -65,7 +66,7 @@ export function Preview(props) {
                   setExpandedPanels(prev => [...prev, { path, expanded: true }]);
                 });
             } else {
-              console.error("Unauthorized - pLease login first to continue");
+              console.warn("Unauthorized - pLease login first to continue");
               navigate("/routing");
             }
           })
