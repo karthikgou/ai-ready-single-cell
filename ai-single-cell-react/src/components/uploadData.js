@@ -414,11 +414,11 @@ export default function UploadData() {
                                         </button></div>
                                     <div className="modal-content" style={{ overflowX: "hidden", overflowY: "hidden" }}>
                                         <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
-                                            <div style={{ paddingLeft: '18%', width: "45%" }}>Name</div>
+                                            <div style={{ paddingLeft: '15%', width: "45%" }}>Name</div>
                                             <div style={{ width: "25%" }}>Type</div>
                                             <div style={{ width: "25%", paddingLeft: "5%" }}>Time Created</div>
                                         </div>
-                                        <div className="modal-content">
+                                        <div>
                                             <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
                                                 <div style={{ paddingLeft: '16%', width: "40%" }} onClick={() => fetchDirContents('..')}><FontAwesomeIcon icon={faTurnUp} /></div>
                                             </div>
@@ -470,31 +470,6 @@ export default function UploadData() {
                                                         <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
                                                     </div>
                                                 ))}
-                                                {/* {isNewDirOn && (<div className="modal-item"><input type="text" defaultValue="New Folder" onKeyDown={(event) => {
-                                                    if (event.key === 'Enter') {
-                                                        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${event.target.value}&authToken=${jwtToken}`, {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json'
-                                                            },
-                                                        })
-                                                            .then(response => {
-                                                                if (response.status === 403) {
-                                                                    throw new Error('Please log in first');
-                                                                }
-                                                                setIsNewDirOn(false);
-                                                                fetchDirContents();
-                                                                return response.json();
-                                                            })
-                                                            .catch(error => {
-                                                                navigate('/routing');
-                                                                console.error(error);
-                                                                return;
-                                                            });
-                                                    }
-                                                }}
-                                                    autoFocus
-                                                /></div>)} */}
                                                 {isNewDirOn && (
                                                     <div className="modal-item">
                                                         <input
@@ -522,7 +497,7 @@ export default function UploadData() {
                                             <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} freeSpace={totalStorage - usedStorage} />
                                         )}
                                         <button style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }} onClick={async () => {
-                                            await setSelectedFiles([]); toggleModal(); setPwd('/')
+                                            await setTempFileList([]); setSelectedFiles([]); toggleModal(); setPwd('/')
                                         }} > <FontAwesomeIcon icon={faXmark} style={{ fontWeight: "bold" }} /> Close</button></div>
                                 </div>)
                             }
