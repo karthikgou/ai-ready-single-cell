@@ -899,6 +899,19 @@ span.sc {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
+/* Styles for
+Updates Page */
+
+.updates-div {
+  border-top: 1px solid grey;
+  margin: 20px 0px;
+}
+
+
+
+
+
+
 
 
 
