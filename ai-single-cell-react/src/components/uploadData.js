@@ -455,6 +455,8 @@ export default function UploadData() {
                                                                 if (event.key === 'Enter') {
                                                                     handleUpdateText(`f${index}`, event.target.value);
                                                                 }
+                                                            }} onBlur={(event) => {
+                                                                handleUpdateText(`f${index}`, event.target.value);
                                                             }}
                                                                 autoFocus
                                                             />
