@@ -27,7 +27,16 @@ export default function UploadData() {
     const [totalStorage, setTotalStorage] = useState(1);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [enabledCheckboxes, setEnabledCheckboxes] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setErrorMessage('');
+        }, 5000);
+        // Return a cleanup function to cancel the timeout when the component unmounts
+        return () => clearTimeout(timeoutId);
+    }, [errorMessage]);
 
     const handleRenameIcon = (id) => {
         fileNames.map((item, index) => {
@@ -198,17 +207,15 @@ export default function UploadData() {
             .then(response => response.json())
             .then(response => {
                 if (response.errorCount > 0) {
-                    window.alert(`Failed to delete ${response.errorCount} file(s).`)
+                    setErrorMessage(`Failed to delete ${response.errorCount} file(s).`);
                 }
             })
             .catch(error => {
                 if (error.message === 'Access denied. Please log in.') {
-                    // display dialog box for access denied error
-                    // alert('Access denied. Please log in.');
                     navigate('/routing');
                 }
                 else if (error.message === 'File(s) being used by datasets.') {
-                    alert('Unable to delete. File(s) being used by datasets.');
+                    setErrorMessage('Delete failed. File(s) being used by datasets.');
                 } else {
                     console.log('Error deleting file: ', error);
                 }
@@ -301,11 +308,11 @@ export default function UploadData() {
 
     const handleSubmit = (event) => {
         if (selectedFiles === undefined || selectedFiles.length === 0) {
-            window.alert('Select at least one file.');
+            setErrorMessage('Select at least one file.');
             return;
         }
         else if (jwtToken === undefined || jwtToken.length === 0) {
-            window.alert('Select at least one file.');
+            setErrorMessage('Please log in first.');
             return;
         }
         formData['authToken'] = jwtToken;
@@ -319,14 +326,13 @@ export default function UploadData() {
         })
             .then(response => {
                 if (response.status === 201) {
-                    alert('Dataset created successfully.');
-                    window.location.reload();
+                    navigate('/mydata/preview-datasets', { state: { message: 'Dataset created successfully.' } });
                 } else {
                     console.log('Error creating dataset:', response);
                 }
             })
             .catch(error => {
-                alert('Error creating dataset.');
+                setErrorMessage('Error creating dataset.');
                 console.error('Error creating dataset:', error);
             });
         setIsButtonDisabled(true);
@@ -345,6 +351,12 @@ export default function UploadData() {
                 {/* <LeftNav /> */}
             </div>
             <div className="main-content">
+                {(errorMessage !== '') && (
+                    <div className='message-box' style={{ backgroundColor: 'lightpink' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <p>{errorMessage}</p>
+                        </div>
+                    </div>)}
                 <div className="main-content">
                     <h2 style={{ textAlign: "left" }}><span>Input</span></h2>
                     <div>        <div>

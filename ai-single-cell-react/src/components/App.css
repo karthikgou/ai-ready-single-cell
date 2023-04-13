@@ -882,8 +882,22 @@ span.sc {
   color: #4070a0;
 }
     
-
-
+/* Alerts */
+.message-box{
+  position: absolute;
+  z-index: 999;
+  left: 35%;
+  display: inline;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 30%;
+  margin-top: 50px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
 
 
 

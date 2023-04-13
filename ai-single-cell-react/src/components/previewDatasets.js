@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Typography,
   CircularProgress,
@@ -11,10 +11,11 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+
 const FLASK_PREVIEW_DATASET_API = `http://${process.env.REACT_APP_HOST_URL}:5000`;
 const PREVIEW_DATASETS_API = `http://${process.env.REACT_APP_HOST_URL}:3001`;
 
-export function Preview() {
+export function Preview(props) {
 
   const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState('');
@@ -24,7 +25,17 @@ export function Preview() {
   const [loadedHtmlContent, setLoadedHtmlContent] = useState({});
   let jwtToken = getCookie('jwtToken');
   const [datasets, setDatasets] = useState([]);
+  let { message } = props;
+  const [hasMessage, setHasMessage] = useState(message !== '' && message !== undefined);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      message = '';
+      setHasMessage(false);
+    }, 5000);
+    // Return a cleanup function to cancel the timeout when the component unmounts
+    return () => clearTimeout(timeoutId);
+  }, [message]);
 
   const handlePanelExpanded = (path, files) => {
     if (!loadedPanels.includes(path)) {
@@ -87,11 +98,18 @@ export function Preview() {
     }
   }, [jwtToken, navigate]);
 
+  console.log('Inside component: ' + message);
   return (
     <div className='preview-dataset-container'>
-       {datasets.map(dataset => (
+      {hasMessage && (
+        <div className='message-box' style={{ backgroundColor: '#bdf0c0' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p>{message}</p>
+          </div>
+        </div>)}
+      {datasets.map(dataset => (
         <div key={dataset.id}>
-          <Accordion key={dataset.id} onChange={() => handlePanelExpanded(dataset.direc,dataset.files)}>
+          <Accordion key={dataset.id} onChange={() => handlePanelExpanded(dataset.direc, dataset.files)}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
               <div className="panel-summary">
                 <h3>Title: {dataset.title}</h3>
@@ -100,10 +118,10 @@ export function Preview() {
                 <p>ParentDirec: {dataset.direc}</p>
                 <p>Files: </p>
                 <ul>
-                {dataset.files.map(file => (
-                  <li key={file.file_id}>{file.file_loc}</li>
-                ))}
-            </ul>
+                  {dataset.files.map(file => (
+                    <li key={file.file_id}>{file.file_loc}</li>
+                  ))}
+                </ul>
               </div>
             </AccordionSummary>
             <AccordionDetails>
@@ -113,9 +131,9 @@ export function Preview() {
                 <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
               )}
             </AccordionDetails>
-          </Accordion> 
-          </div>
-          ))}       
-      </div>   
+          </Accordion>
+        </div>
+      ))}
+    </div>
   )
 };

@@ -1,12 +1,18 @@
 import { Preview } from "../components/previewDatasets"
 import RightRail from "../components/rightRail"
+import { useLocation } from 'react-router-dom';
+
 export default function PreviewDatasets() {
+    const location = useLocation();
+    const message = location.state?.message || '';
+    console.log('Inside Page: ' + message);
+
     return(
         <div className="page-container">
             <div className="left-nav">
             </div>
             <div className="main-content">
-                <Preview />
+                <Preview message={message}/>
             </div>
             <div className="right-rail">
                 <RightRail />
