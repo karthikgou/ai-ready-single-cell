@@ -43,8 +43,9 @@ export default function UppyUploader(props) {
         autoProceed: false,
         allowMultipleUploads: true,
         restrictions: {
-            maxFileSize: freeSpace * 1024 * 1024 * 1024, // 1 GB
+            maxFileSize: freeSpace * 1024 * 1024 * 1024,
             maxNumberOfFiles: 5,
+            maxTotalFileSize: freeSpace * 1024 * 1024 * 1024,
         },
         debug: true,
     });
@@ -70,8 +71,8 @@ export default function UppyUploader(props) {
         return (<div className="uppy-modal">
             <Dashboard uppy={uppy} plugins={['GoogleDrive', 'OneDrive', 'Dropbox']} />
             <button style={{
-                top: `${dimensions.height * 0.5 + 230}px`,
-                left: `${dimensions.width * 0.5 + 320}px`,
+                top: `${dimensions.height * 0.5 + 245}px`,
+                left: `${dimensions.width * 0.5 + 330}px`,
                 position: "absolute",
                 transform: "translate(-50%, -50%)",
                 padding: "5px 5px",
