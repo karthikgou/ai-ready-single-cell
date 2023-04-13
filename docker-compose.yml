@@ -21,11 +21,11 @@ services:
       - ai-single-cell
 
       # Cache
-  cache:
-      container_name: oscb_cache_container
-      image: redis:7.0-alpine
-      networks:
-        - ai-single-cell
+  # cache:
+  #     container_name: oscb_cache_container
+  #     image: redis:7.0-alpine
+  #     networks:
+  #       - ai-single-cell
 
   oscb_node:
     container_name: oscb_node_container
