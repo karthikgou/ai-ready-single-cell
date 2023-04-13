@@ -72,7 +72,6 @@ services:
     volumes:
         - ./uploads:/directus/uploads
     depends_on:
-        - cache
         - oscb_mysql
     env_file:
         - .env
