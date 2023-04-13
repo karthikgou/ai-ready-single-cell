@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import axios from 'axios';
 import ReactMarkdown from "react-markdown"
 import LeftNav from "../components/leftNav";
+import gfm from "remark-gfm";
+import remarkImgToJsx from "remark-unwrap-images";
 import RightRail from "../components/rightRail";
 
 const DIRECTUS_URL = `http://${process.env.REACT_APP_HOST_URL}:8055`
@@ -39,12 +41,12 @@ export default function GetStarted() {
         
         <div className="getStarted-container">
 
-            <div className="left-nav border-r">
+            <div className="left-nav">
                 {/* <LeftNav /> */}
             </div>
 
             <div className="main-content">
-                <ReactMarkdown children={markdownText}/>
+                <ReactMarkdown plugins={[gfm, remarkImgToJsx]} children={markdownText}/>
             </div>
 
             <div className="right-rail">

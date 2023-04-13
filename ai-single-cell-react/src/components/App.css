@@ -335,6 +335,8 @@ Styles for Benchmarks page
 
 .main-content {
   padding: 15px;
+  overflow: scroll;
+  height: 100vh;
 }
 
 .right-rail {
@@ -504,7 +506,7 @@ Styles for Right Rail
 
 .results-window{
   /* border: 1px solid black; */
-  height: 100vh
+  height: 480px
 }
 
 svg {
@@ -802,9 +804,9 @@ ul li:hover > ul {
   max-width: 30rem;
   max-height: 100%;
 }
-.main-content h2{
+/* .main-content h2{
   text-align: center;
-}
+} */
 
 .main-content a{
   color: #111849;
@@ -903,10 +905,15 @@ span.sc {
 Updates Page */
 
 .updates-div {
-  border-top: 1px solid grey;
   margin: 20px 0px;
+  border-top-width: 3px;
 }
 
+
+.getStarted-container .main-content img{
+  align-items: center;
+  justify-content: center;
+}
 
 
 

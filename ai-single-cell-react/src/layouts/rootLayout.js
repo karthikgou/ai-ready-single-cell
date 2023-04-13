@@ -32,7 +32,7 @@ export default function RootLayout() {
     const handleLogoutClick = () => {
         if(deleteCookie('jwtToken'))
         setIsUserLoggedIn(false);
-        navigate('/');
+        navigate('/getStarted');
         window.location.reload();  
         
     }
@@ -232,7 +232,7 @@ export default function RootLayout() {
                                             <li><NavLink to="login/reports">Reports</NavLink></li>
                                             <li><NavLink to="login/security">Security</NavLink></li>
                                             {isUserLoggedIn ? (
-                                                <li><span onClick={handleLogoutClick}>Log Out</span></li>
+                                                <li><span style={{ cursor: 'pointer'}} onClick={handleLogoutClick}>Log Out</span></li>
                                             ) : (
                                                 <li><NavLink to="login">Log In</NavLink></li>
                                             )}

@@ -1,11 +1,11 @@
-import LeftNav from "../components/leftNav";
+// import LeftNav from "../components/leftNav";
 import RightRail from "../components/rightRail";
 
 export default function Competitions() {
     return(
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
                 <h1>I'm inside competitions page</h1>

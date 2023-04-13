@@ -6,7 +6,7 @@ export default function RoutingTemplate() {
             <div className="left-nav">
                 {/* <LeftNav /> */}
             </div>
-            <div className="main-content">
+            <div>
                 <UserRouting />
             </div>
             <div className="right-rail">

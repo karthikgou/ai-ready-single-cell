@@ -382,7 +382,7 @@ export default function UploadData() {
                             <p>{errorMessage}</p>
                         </div>
                     </div>)}
-                <div className="main-content">
+                <div>
                     <h2 style={{ textAlign: "left" }}><span>Input</span></h2>
                     <div>        <div>
                         <div id="upload-data-div">

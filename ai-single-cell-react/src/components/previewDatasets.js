@@ -107,7 +107,8 @@ export function Preview(props) {
             <p>{message}</p>
           </div>
         </div>)}
-      {datasets.map(dataset => (
+        {datasets.length ===0 ? (<h3>Sorry, there are no datasets available to preview</h3>) : (
+        datasets.map(dataset => (
         <div key={dataset.id}>
           <Accordion key={dataset.id} onChange={() => handlePanelExpanded(dataset.direc, dataset.files)}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
@@ -133,7 +134,8 @@ export function Preview(props) {
             </AccordionDetails>
           </Accordion>
         </div>
-      ))}
+      ))
+      )}
     </div>
   )
 };

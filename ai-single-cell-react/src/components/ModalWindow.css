@@ -190,6 +190,6 @@ button[type="submit"] {
 }
 
 *, :after, :before {
-  border: unset;
+  /* border: unset; */
   box-sizing: unset;
 }

@@ -6,7 +6,7 @@ export default function Login() {
             <div className="left-nav">
                 {/* <LeftNav /> */}
             </div>
-            <div className="main-content">
+            <div>
                 <Signup />
             </div>
             <div className="right-rail">

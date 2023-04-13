@@ -6,7 +6,7 @@ export default function Login(props) {
             <div className="left-nav">
                 {/* <LeftNav /> */}
             </div>
-            <div className="main-content">
+            <div>
                 <LoginPage />
             </div>
             <div className="right-rail">

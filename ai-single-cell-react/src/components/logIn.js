@@ -47,7 +47,7 @@ function LoginPage (props) {
     }).then(response => response.json())
     .then(data => {
       if(data.status === 200) {
-        navigate('/');
+        navigate('/getStarted');
         window.location.reload();  
       } else {
         setErrorMessage(data.message);
@@ -84,7 +84,7 @@ function LoginPage (props) {
         <p>Please enter your username and password to log in.</p>
         
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-        <form onSubmit={handleLogin} className='form-input'>
+        <form onSubmit={handleLogin}>
           <div>
             <label htmlFor="username">Username:</label>
             <input type="username" id="username" className="form-input" value={username} autoComplete="username" onChange={handleUsernameChange} placeholder="Username"/>

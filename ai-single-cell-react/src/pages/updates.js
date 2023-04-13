@@ -48,7 +48,7 @@ export default function Updates() {
                 {/* <h2>{user[user.length-1].Title} - {formatDate(user[user.length-1].Date_published)}</h2> */}
 
                 {updates.map((item,index)=>(
-                    <div className="updates-div">
+                    <div className="updates-div border-gray-100">
                         <h4>{formatDate(item.date_published)} : {item.title}</h4>
                         <div dangerouslySetInnerHTML={{ __html: item.update_description }}></div>
                     </div>

@@ -35,7 +35,7 @@ export default function Team() {
 
     return(
         <div className="page-container">
-            <div className="left-nav border-r">
+            <div className="left-nav">
                 {/* <LeftNav /> */}
             </div>
         
