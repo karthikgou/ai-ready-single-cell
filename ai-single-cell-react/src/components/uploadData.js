@@ -196,7 +196,7 @@ export default function UploadData() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ fileList: selectedFiles })
+            body: JSON.stringify({ fileList: fileListBuffer })
         })
             .then(response => {
                 if (response.status === 403) {
@@ -223,7 +223,7 @@ export default function UploadData() {
                     console.log('Error deleting file: ', error);
                 }
             });
-        setSelectedFiles([]);
+        setFileListBuffer([]);
         fetchDirContents();
     }
 
@@ -259,8 +259,8 @@ export default function UploadData() {
         const apiUrl = `${SERVER_URL}/download`;
 
         // If fileUrl is not empty, call the API with fileUrl as query parameter
-        if (selectedFiles.length == 1) {
-            const fileUrl = selectedFiles[0]
+        if (fileListBuffer.length == 1) {
+            const fileUrl = fileListBuffer[0]
             const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
             fetch(`${apiUrl}?fileUrl=${fileUrl}&authToken=${jwtToken}`)
                 .then(response => {
@@ -282,13 +282,13 @@ export default function UploadData() {
                 });
         }
 
-        else if (selectedFiles.length > 1) {
+        else if (fileListBuffer.length > 1) {
             fetch(`${apiUrl}?authToken=${jwtToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ fileList: selectedFiles })
+                body: JSON.stringify({ fileList: fileListBuffer })
             })
                 .then(response => {
                     return response.blob();
