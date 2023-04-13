@@ -27,8 +27,8 @@ export default function UploadData() {
     const [totalStorage, setTotalStorage] = useState(1);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [enabledCheckboxes, setEnabledCheckboxes] = useState([]);
+    const [tempFileList, setTempFileList] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
-    const [fileListBuffer, setFileListBuffer] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -75,13 +75,13 @@ export default function UploadData() {
     }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
-        console.log('filesSelected: ' + fileListBuffer);
+        console.log('filesSelected: ' + tempFileList);
         name = name.replace("//", "/");
-        if (!fileListBuffer.includes(name)) {
-            fileListBuffer.push(name);
+        if (!tempFileList.includes(name)) {
+            tempFileList.push(name);
         }
         else
-            fileListBuffer.pop(name)
+            tempFileList.pop(name)
     }
 
     const handleUpdateText = (id, newText) => {
@@ -104,11 +104,11 @@ export default function UploadData() {
     const toggleModal = async () => {
         await setIsFileManagerOpen(!isFileManagerOpen);
 
-        setSelectedFiles(fileListBuffer);
+        setSelectedFiles(tempFileList);
 
         if (!isFileManagerOpen) {
             setSelectedFiles([]);
-            setFileListBuffer([]);
+            setTempFileList([]);
             fetchDirContents();
         }
     }
@@ -196,7 +196,7 @@ export default function UploadData() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ fileList: fileListBuffer })
+            body: JSON.stringify({ fileList: tempFileList })
         })
             .then(response => {
                 if (response.status === 403) {
@@ -223,7 +223,7 @@ export default function UploadData() {
                     console.log('Error deleting file: ', error);
                 }
             });
-        setFileListBuffer([]);
+        setTempFileList([]);
         fetchDirContents();
     }
 
@@ -253,14 +253,36 @@ export default function UploadData() {
 
     }
 
+    function createNewFolder(folderName) {
+        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${folderName}&authToken=${jwtToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (response.status === 403) {
+                    throw new Error('Please log in first');
+                }
+                setIsNewDirOn(false);
+                fetchDirContents();
+                return response.json();
+            })
+            .catch(error => {
+                navigate('/routing');
+                console.error(error);
+                return;
+            });
+    }
+
 
     function downloadFiles() {
 
         const apiUrl = `${SERVER_URL}/download`;
 
         // If fileUrl is not empty, call the API with fileUrl as query parameter
-        if (fileListBuffer.length == 1) {
-            const fileUrl = fileListBuffer[0]
+        if (tempFileList.length == 1) {
+            const fileUrl = tempFileList[0]
             const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
             fetch(`${apiUrl}?fileUrl=${fileUrl}&authToken=${jwtToken}`)
                 .then(response => {
@@ -282,13 +304,13 @@ export default function UploadData() {
                 });
         }
 
-        else if (fileListBuffer.length > 1) {
+        else if (tempFileList.length > 1) {
             fetch(`${apiUrl}?authToken=${jwtToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ fileList: fileListBuffer })
+                body: JSON.stringify({ fileList: tempFileList })
             })
                 .then(response => {
                     return response.blob();
@@ -307,28 +329,6 @@ export default function UploadData() {
         }
 
 
-    }
-
-    function createNewFolder(folderName) {
-        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${folderName}&authToken=${jwtToken}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-            .then(response => {
-                if (response.status === 403) {
-                    throw new Error('Please log in first');
-                }
-                setIsNewDirOn(false);
-                fetchDirContents();
-                return response.json();
-            })
-            .catch(error => {
-                navigate('/routing');
-                console.error(error);
-                return;
-            });
     }
 
     const handleSubmit = (event) => {
@@ -468,6 +468,31 @@ export default function UploadData() {
                                                         <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
                                                     </div>
                                                 ))}
+                                                {/* {isNewDirOn && (<div className="modal-item"><input type="text" defaultValue="New Folder" onKeyDown={(event) => {
+                                                    if (event.key === 'Enter') {
+                                                        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${event.target.value}&authToken=${jwtToken}`, {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json'
+                                                            },
+                                                        })
+                                                            .then(response => {
+                                                                if (response.status === 403) {
+                                                                    throw new Error('Please log in first');
+                                                                }
+                                                                setIsNewDirOn(false);
+                                                                fetchDirContents();
+                                                                return response.json();
+                                                            })
+                                                            .catch(error => {
+                                                                navigate('/routing');
+                                                                console.error(error);
+                                                                return;
+                                                            });
+                                                    }
+                                                }}
+                                                    autoFocus
+                                                /></div>)} */}
                                                 {isNewDirOn && (
                                                     <div className="modal-item">
                                                         <input
@@ -485,6 +510,7 @@ export default function UploadData() {
                                                         />
                                                     </div>
                                                 )}
+
                                             </div>
                                         </div>
                                     </div>
