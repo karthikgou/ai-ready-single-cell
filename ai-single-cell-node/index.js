@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 const dbConfig = JSON.parse(fs.readFileSync('./configs/dbconfigs.json'));
 const storageConfig = JSON.parse(fs.readFileSync('./configs/storageConfig.json'));
-const {storageDir, storageAllowance} = storageConfig;
+const { storageDir, storageAllowance } = storageConfig;
 
 // Create a connection pool to handle multiple connections to the database
 const pool = mysql.createPool({
@@ -90,10 +90,11 @@ app.post('/api/signup', (req, res) => {
             }
 
             try {
-                if(!err) {
-                    fs.promises.mkdir(storageDir + username);
+                if (!err) {
+                    if (!fs.existsSync(storageDir + username))
+                        fs.promises.mkdir(storageDir + username);
                     res.json({ status: 200, message: 'User account created successfully' });
-                }          
+                }
             }
             catch (error) {
                 res.json({ status: 500, message: 'Error occured while creating a storage directory for the user' });
@@ -578,62 +579,62 @@ app.get('/getStorageDetails', async (req, res) => {
 
 // Route to get datasets and files for a specific user
 app.get('/preview/datasets', (req, res) => {
-    
+
     const { authToken } = req.query;
-    
+
     const username = getUserFromToken(authToken);
 
     if (username == "Unauthorized") {
         return res.status(403).jsonp(username);
     }
-    
+
     // Get user ID based on username
     const userQuery = `SELECT user_id FROM users WHERE username = '${username}'`;
-    
+
     pool.query(userQuery, (err, userResult) => {
-      if (err) throw err;
-      
-      if (userResult.length === 0) {
-        res.status(404).send(`User '${username}' not found`);
-      } else {
-        const userID = userResult[0].user_id;
-        
-        // Get datasets and files for the specified user
-        const datasetsQuery = `
+        if (err) throw err;
+
+        if (userResult.length === 0) {
+            res.status(404).send(`User '${username}' not found`);
+        } else {
+            const userID = userResult[0].user_id;
+
+            // Get datasets and files for the specified user
+            const datasetsQuery = `
           SELECT dataset.dataset_id, dataset.title, dataset.n_cells, dataset.reference, dataset.summary, file.file_id, file.file_loc, SUBSTRING_INDEX(SUBSTRING_INDEX(file.file_loc, '/', 2), '/', -1) AS direc
           FROM dataset
           JOIN file ON dataset.dataset_id = file.dataset_id
           WHERE dataset.user_id = ${userID}
         `;
-        
-        pool.query(datasetsQuery, (err, datasetsResult) => {
-          if (err) throw err;
-          
-          const datasets = {};
-  
-          datasetsResult.forEach(row => {
-            const { dataset_id, title, n_cells, reference, summary, file_id, file_loc, direc } = row;
-            if (!datasets[dataset_id]) {
-              datasets[dataset_id] = {
-                title,
-                n_cells,
-                reference,
-                summary,
-                files: [],
-                direc
-              };
-            }
-            datasets[dataset_id].files.push({
-              file_id,
-              file_loc
+
+            pool.query(datasetsQuery, (err, datasetsResult) => {
+                if (err) throw err;
+
+                const datasets = {};
+
+                datasetsResult.forEach(row => {
+                    const { dataset_id, title, n_cells, reference, summary, file_id, file_loc, direc } = row;
+                    if (!datasets[dataset_id]) {
+                        datasets[dataset_id] = {
+                            title,
+                            n_cells,
+                            reference,
+                            summary,
+                            files: [],
+                            direc
+                        };
+                    }
+                    datasets[dataset_id].files.push({
+                        file_id,
+                        file_loc
+                    });
+                });
+
+                res.json(datasets);
             });
-          });
-  
-          res.json(datasets);
-        });
-      }
+        }
     });
-  });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3001;
