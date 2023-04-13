@@ -20,6 +20,7 @@ export function Preview(props) {
   const [expandedPanels, setExpandedPanels] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedHtmlContent, setLoadedHtmlContent] = useState({});
+  const navigate = useNavigate();
   let jwtToken = getCookie('jwtToken');
   const [datasets, setDatasets] = useState([]);
   let { message } = props;
@@ -65,6 +66,7 @@ export function Preview(props) {
                 });
             } else {
               console.error("Unauthorized - pLease login first to continue");
+              navigate("/routing");
             }
           })
           .catch((error) => console.error(error));
