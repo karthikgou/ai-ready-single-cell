@@ -28,6 +28,7 @@ export default function UploadData() {
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [enabledCheckboxes, setEnabledCheckboxes] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
+    const [fileListBuffer, setFileListBuffer] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -74,13 +75,13 @@ export default function UploadData() {
     }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
-        console.log('filesSelected: ' + selectedFiles);
+        console.log('filesSelected: ' + fileListBuffer);
         name = name.replace("//", "/");
-        if (!selectedFiles.includes(name)) {
-            selectedFiles.push(name);
+        if (!fileListBuffer.includes(name)) {
+            fileListBuffer.push(name);
         }
         else
-            selectedFiles.pop(name)
+            fileListBuffer.pop(name)
     }
 
     const handleUpdateText = (id, newText) => {
@@ -103,9 +104,11 @@ export default function UploadData() {
     const toggleModal = async () => {
         await setIsFileManagerOpen(!isFileManagerOpen);
 
+        setSelectedFiles(fileListBuffer);
 
         if (!isFileManagerOpen) {
             setSelectedFiles([]);
+            setFileListBuffer([]);
             fetchDirContents();
         }
     }
