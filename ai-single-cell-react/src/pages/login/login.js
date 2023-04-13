@@ -7,7 +7,7 @@ export default function Login(props) {
                 {/* <LeftNav /> */}
             </div>
             <div className="main-content">
-                <LoginPage userStates={props.isUserLoggedIn} functions={props.handleLoginClick}/>
+                <LoginPage />
             </div>
             <div className="right-rail">
                 {/* <RightRail /> */}

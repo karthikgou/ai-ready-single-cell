@@ -49,29 +49,36 @@ export function Preview(props) {
         setIsLoading(false);
       } else {
         // If it hasn't, make a call to the Flask API to get the HTML content
+
+        // If user is not logged In - navigate to login page
+        if(jwtToken === null || jwtToken === undefined || jwtToken === '') {
+          navigate("/routing");
+        }
+
+        // Else verify the authenticity of the user
         isUserAuth(jwtToken)
-          .then((authData) => {
-            if (authData.isAuth) {
-              fetch(FLASK_PREVIEW_DATASET_API + '/preview/dataset', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ path: path, files: files, username: authData.username }),
-              })
-                .then(response => response.text())
-                .then(data => {
-                  setHtmlContent(data);
-                  setLoadedHtmlContent(prev => ({ ...prev, [path]: data }));
-                  setIsLoading(false);
-                  setExpandedPanels(prev => [...prev, { path, expanded: true }]);
-                });
-            } else {
-              console.warn("Unauthorized - pLease login first to continue");
-              navigate("/routing");
-            }
-          })
-          .catch((error) => console.error(error));
+        .then((authData) => {
+          if (authData.isAuth) {
+            fetch(FLASK_PREVIEW_DATASET_API + '/preview/dataset', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ path: path, files: files, username:authData.username}),
+            })
+            .then(response => response.text())
+            .then(data => {
+              setHtmlContent(data);
+              setLoadedHtmlContent(prev => ({ ...prev, [path]: data }));
+              setIsLoading(false);
+              setExpandedPanels(prev => [...prev, { path, expanded: true }]);
+            });
+          } else {
+            console.warn("Unauthorized - pLease login first to continue");
+            navigate("/routing");
+          }
+        })
+        .catch((error) => console.error(error));
       }
       setLoadedPanels(prev => [...prev, path]);
     } else {
@@ -80,12 +87,16 @@ export function Preview(props) {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get(PREVIEW_DATASETS_API + "/preview/datasets?authToken=" + jwtToken);
-      setDatasets(Object.values(response.data));
-    };
-    fetchData();
-  }, [jwtToken]);
+    if(jwtToken) {
+      const fetchData = async () => {
+        const response = await axios.get(PREVIEW_DATASETS_API + "/preview/datasets?authToken=" + jwtToken);
+        setDatasets(Object.values(response.data));
+      };
+      fetchData();
+    } else {
+      navigate("/routing");
+    }
+  }, [jwtToken, navigate]);
 
   console.log('Inside component: ' + message);
   return (

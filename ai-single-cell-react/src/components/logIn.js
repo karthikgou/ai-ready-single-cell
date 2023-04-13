@@ -87,11 +87,11 @@ function LoginPage (props) {
         <form onSubmit={handleLogin} className='form-input'>
           <div>
             <label htmlFor="username">Username:</label>
-            <input type="username" id="username" className="form-input" value={username} onChange={handleUsernameChange} placeholder="Username"/>
+            <input type="username" id="username" className="form-input" value={username} autoComplete="username" onChange={handleUsernameChange} placeholder="Username"/>
           </div>
           <div>
             <label htmlFor="password">Password:</label>
-            <input type="password" id="password" value={password} className="form-input" onChange={handlePasswordChange} placeholder="Password" />
+            <input type="password" id="password" value={password} className="form-input" autoComplete="new-password" onChange={handlePasswordChange} placeholder="Password" />
           </div>
           <div className='checkbox'>
             <input type="checkbox" id="remember-me" checked={rememberMe} onChange={handleCheckboxChange} />
