@@ -63,6 +63,7 @@ export default function UploadData() {
                 type="submit"
                 onClick={handleClick}
                 disabled={isButtonDisabled || disabled}
+                style={{ cursor: "pointer" }}
             >
                 Submit
             </button>
@@ -142,10 +143,15 @@ export default function UploadData() {
 
     const fetchDirContents = async (subdir) => {
 
-        enabledCheckboxes.forEach((checkboxId) => {
-            const checkbox = document.getElementById(checkboxId);
-            checkbox.checked = false;
-        });
+        try {
+            enabledCheckboxes.forEach((checkboxId) => {
+                const checkbox = document.getElementById(checkboxId);
+                checkbox.checked = false;
+            });
+        }
+        catch (e) {
+            console.log('Exception: ' + e);
+        }
 
         let newDir = ''
         jwtToken = getCookie('jwtToken');
@@ -400,16 +406,16 @@ export default function UploadData() {
                             {isFileManagerOpen && (
                                 <div className="modal">
                                     <div>
-                                        <button type="button" onClick={() => setIsNewDirOn(true)} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                        <button type="button" className="fileManagerButton" onClick={() => setIsNewDirOn(true)} >
                                             <FontAwesomeIcon icon={faPlus} /> New Folder
                                         </button> &nbsp;&nbsp;
-                                        <button type="button" onClick={() => downloadFiles(selectedFiles)} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                        <button type="button" className="fileManagerButton" onClick={() => downloadFiles(selectedFiles)} >
                                             <FontAwesomeIcon icon={faDownload} /> Download
                                         </button>&nbsp;&nbsp;
-                                        <button type="button" onClick={() => { deleteFiles(selectedFiles); }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                        <button type="button" className="fileManagerButton" onClick={() => { deleteFiles(selectedFiles); }} >
                                             <FontAwesomeIcon icon={faTrash} color={red} /> Delete
                                         </button>&nbsp;&nbsp;
-                                        <button type="button" onClick={() => { fetchDirContents() }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}>
+                                        <button type="button" className="fileManagerButton" onClick={() => { fetchDirContents() }} >
                                             <FontAwesomeIcon icon={faRefresh} color={red} /> Refresh
                                         </button></div>
                                     <div className="modal-content" style={{ overflowX: "hidden", overflowY: "hidden" }}>
@@ -491,12 +497,12 @@ export default function UploadData() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div><button onClick={() => { setPwd('/'); toggleModal(); }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
-                                        <button onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }}> <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
+                                    <div><button className="fileManagerButton" onClick={() => { setPwd('/'); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
+                                        <button className="fileManagerButton" onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} > <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
                                         {isUppyModalOpen && (
                                             <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} freeSpace={totalStorage - usedStorage} />
                                         )}
-                                        <button style={{ display: "inline-block", padding: "10px 10px", borderRadius: '5px', cursor: "pointer" }} onClick={async () => {
+                                        <button className="fileManagerButton" onClick={async () => {
                                             await setTempFileList([]); setSelectedFiles([]); toggleModal(); setPwd('/')
                                         }} > <FontAwesomeIcon icon={faXmark} style={{ fontWeight: "bold" }} /> Close</button></div>
                                 </div>)

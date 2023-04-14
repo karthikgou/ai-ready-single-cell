@@ -67,7 +67,23 @@
     cursor: pointer;
     outline: none;
   }
-  
+
+  .fileManagerButton {
+    display: inline-block;
+    padding: 10px 10px; 
+    border-radius: 5px; 
+    cursor: pointer;
+  }
+
+  .fileManagerButton:hover {
+    background-color: #e5e5e5;
+  }
+
+  .fileManagerButton:active {
+    background-color: #999;
+    color: white;
+  }
+
   .close-button:hover {
     color: #333;
   }
