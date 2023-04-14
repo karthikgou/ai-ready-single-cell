@@ -76,13 +76,14 @@ export default function UploadData() {
     }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
-        console.log('filesSelected: ' + tempFileList);
         name = name.replace("//", "/");
         if (!tempFileList.includes(name)) {
             tempFileList.push(name);
         }
         else
             tempFileList.pop(name)
+        console.log('filesSelected: ' + tempFileList);
+
     }
 
     const handleUpdateText = (id, newText) => {
@@ -358,7 +359,11 @@ export default function UploadData() {
             .then(response => {
                 if (response.status === 201) {
                     navigate('/mydata/preview-datasets', { state: { message: 'Dataset created successfully.' } });
-                } else {
+                }
+                else if (response.status === 400) {
+                    setErrorMessage(`Dataset '${formData.title}' already exists. Choose a different name.`);
+                }
+                else {
                     console.log('Error creating dataset:', response);
                 }
             })
@@ -424,7 +429,7 @@ export default function UploadData() {
                                             <div style={{ width: "25%" }}>Type</div>
                                             <div style={{ width: "25%", paddingLeft: "5%" }}>Time Created</div>
                                         </div>
-                                        <div>
+                                        <div className="modal-content-scroll">
                                             <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
                                                 <div style={{ paddingLeft: '16%', width: "40%" }} onClick={() => fetchDirContents('..')}><FontAwesomeIcon icon={faTurnUp} /></div>
                                             </div>
@@ -432,7 +437,7 @@ export default function UploadData() {
                                                 <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                                                     <FontAwesomeIcon icon={faFolder} onClick={log} /> &nbsp;&nbsp;
                                                     <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`d${index}`); }} /> &nbsp;&nbsp;
-                                                    <input type='checkbox' id={`dirCheckbox${index + 1}`} className="selectFiles" align='center' onChange={() => { setEnabledCheckboxes([...enabledCheckboxes, `dirCheckbox${index + 1}`]); pushOrPopName(pwd + '/' + dir.name) }}></input>
+                                                    <input type='checkbox' id={`dirCheckbox${index + 1}`} className="selectFiles" align='center' onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `dirCheckbox${index + 1}`]); await pushOrPopName(pwd + '/' + dir.name) }}></input>
                                                     {selectedItemId === `d${index}` ? (
                                                         <input type="text" defaultValue={dir.name} onKeyDown={(event) => {
                                                             if (event.key === 'Enter') {
@@ -444,7 +449,7 @@ export default function UploadData() {
                                                             autoFocus
                                                         />
                                                     ) : (
-                                                        <div style={{ paddingLeft: '6%', width: "40%" }}><a style={{ color: "black" }} onClick={() => { fetchDirContents(dir.name); }}>{dir.name}</a></div>
+                                                        <div style={{ paddingLeft: '6%', width: "40%" }}><a style={{ color: "black", textDecoration: "none" }} onClick={() => { fetchDirContents(dir.name); }}>{dir.name}</a></div>
                                                     )}
                                                     <div style={{ paddingLeft: '4%', width: "25%" }}>Folder</div>
                                                     <div style={{ paddingLeft: '5%', width: "25%" }}>{dir.created}</div>
@@ -455,7 +460,7 @@ export default function UploadData() {
                                                     <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                                                         <FontAwesomeIcon icon={faFile} /> &nbsp;&nbsp;&nbsp;
                                                         <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`f${index}`); }} /> &nbsp;&nbsp;
-                                                        <input type='checkbox' id={`fileCheckbox${index + 1}`} className="selectFiles" onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `fileCheckbox${index + 1}`]); pushOrPopName(pwd + '/' + file.name); }}></input>
+                                                        <input type='checkbox' id={`fileCheckbox${index + 1}`} className="selectFiles" onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `fileCheckbox${index + 1}`]); await pushOrPopName(pwd + '/' + file.name); }}></input>
                                                         {selectedItemId === `f${index}` ? (
                                                             <input type="text" defaultValue={file.name} onKeyDown={(event) => {
                                                                 if (event.key === 'Enter') {
@@ -484,20 +489,33 @@ export default function UploadData() {
                                                             onKeyDown={(event) => {
                                                                 if (event.key === 'Enter') {
                                                                     createNewFolder(event.target.value);
+                                                                } else if (event.key === 'Escape') {
+                                                                    setIsNewDirOn(false);
                                                                 }
                                                             }}
                                                             onBlur={(event) => {
-                                                                createNewFolder(event.target.value);
+                                                                if (isNewDirOn) createNewFolder(event.target.value);
                                                             }}
                                                             autoFocus
+                                                            onFocus={(event) => {
+                                                                event.target.select();
+                                                            }}
+                                                        />  &nbsp;&nbsp;
+                                                        <FontAwesomeIcon
+                                                            icon={faXmark}
+                                                            style={{ fontWeight: "bold", cursor: "pointer" }}
+                                                            onMouseDown={(event) => {
+                                                                event.preventDefault();
+                                                                setIsNewDirOn(false);
+                                                            }}
                                                         />
                                                     </div>
                                                 )}
-
+                                                <div style={{ height: "20px" }}></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div><button className="fileManagerButton" onClick={() => { setPwd('/'); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
+                                    <div style={{ paddingTop: "7px" }}><button className="fileManagerButton" onClick={() => { setPwd('/'); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
                                         <button className="fileManagerButton" onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} > <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
                                         {isUppyModalOpen && (
                                             <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} freeSpace={totalStorage - usedStorage} />
