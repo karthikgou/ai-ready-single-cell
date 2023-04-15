@@ -121,8 +121,6 @@ export default function UploadData() {
     const toggleModal = async () => {
         await setIsFileManagerOpen(!isFileManagerOpen);
 
-        setSelectedFiles(tempFileList);
-
         if (!isFileManagerOpen) {
             setSelectedFiles([]);
             setTempFileList([]);
@@ -539,7 +537,7 @@ export default function UploadData() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div style={{ paddingTop: "7px" }}><button className="fileManagerButton" onClick={() => { setPwd('/'); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
+                                    <div style={{ paddingTop: "7px" }}><button className="fileManagerButton" onClick={() => { setPwd('/'); setSelectedFiles(tempFileList); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
                                         <button className="fileManagerButton" onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} > <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
                                         {isUppyModalOpen && (
                                             <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} freeSpace={totalStorage - usedStorage} />
