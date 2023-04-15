@@ -7,6 +7,8 @@ import { red } from "@mui/material/colors";
 import { getCookie } from '../utils/utilFunctions';
 import UppyUploader from "./uppy";
 import Form from "@rjsf/core";
+import close_icon from '../assets/close_icon_u86.svg';
+import close_icon_hover from '../assets/close_icon_u86_mouseOver.svg';
 
 import schema from "./uploadDataSchema.json";
 import RightRail from "./rightRail";
@@ -30,11 +32,24 @@ export default function UploadData() {
     const [tempFileList, setTempFileList] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    const [hoveredErrPopup, setHoveredErrPopup] = useState(false);
+
+    const handleMouseOver = () => {
+        setHoveredErrPopup(true);
+    };
+
+    const handleMouseOut = () => {
+        setHoveredErrPopup(false);
+    };
+
+    const handleCrossButtonClick = () => {
+        setErrorMessage('');
+    }
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setErrorMessage('');
-        }, 5000);
+        }, 30000);
         // Return a cleanup function to cancel the timeout when the component unmounts
         return () => clearTimeout(timeoutId);
     }, [errorMessage]);
@@ -391,6 +406,9 @@ export default function UploadData() {
                     <div className='message-box' style={{ backgroundColor: 'lightpink' }}>
                         <div style={{ textAlign: 'center' }}>
                             <p>{errorMessage}</p>
+                            <div style={{position: "absolute", right: "12px", top: "20px", cursor: "pointer"}}>
+                                <img src={hoveredErrPopup ? close_icon_hover : close_icon} alt="close-icon" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} onClick={handleCrossButtonClick} />
+                            </div>
                         </div>
                     </div>)}
                 <div>
@@ -449,7 +467,11 @@ export default function UploadData() {
                                                             autoFocus
                                                         />
                                                     ) : (
-                                                        <div style={{ paddingLeft: '6%', width: "40%" }}><a style={{ color: "black", textDecoration: "none" }} onClick={() => { fetchDirContents(dir.name); }}>{dir.name}</a></div>
+                                                        <div style={{ paddingLeft: '6%', width: "40%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                            <a style={{ color: "black", textDecoration: "none" }} title={dir.name} onClick={() => { fetchDirContents(dir.name); }}>
+                                                                {dir.name}
+                                                            </a>
+                                                        </div>
                                                     )}
                                                     <div style={{ paddingLeft: '4%', width: "25%" }}>Folder</div>
                                                     <div style={{ paddingLeft: '5%', width: "25%" }}>{dir.created}</div>
@@ -472,8 +494,10 @@ export default function UploadData() {
                                                                 autoFocus
                                                             />
                                                         ) : (
-                                                            <div style={{ paddingLeft: '6%', width: "40%" }} id={`fid${index}+1`}>
-                                                                {file.name}
+                                                            <div style={{ paddingLeft: '6%', width: "40%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} id={`fid${index + 1}`}>
+                                                                <span title={file.name}>
+                                                                    {file.name}
+                                                                </span>
                                                             </div>
                                                         )}
 
