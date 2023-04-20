@@ -92,14 +92,15 @@ export default function UploadData() {
 
     async function pushOrPopName(name) {
         name = name.replace("//", "/");
-        if (!tempFileList.includes(name)) {
+        const index = tempFileList.indexOf(name);
+        if (index === -1) {
             tempFileList.push(name);
+        } else {
+            tempFileList.splice(index, 1);
         }
-        else
-            tempFileList.pop(name)
         console.log('filesSelected: ' + tempFileList);
-
     }
+
 
     const handleUpdateText = (id, newText) => {
         fileNames.map((file, index) => {
@@ -157,15 +158,17 @@ export default function UploadData() {
 
     const fetchDirContents = async (subdir) => {
 
-        try {
-            enabledCheckboxes.forEach((checkboxId) => {
+        enabledCheckboxes.forEach((checkboxId) => {
+            try {
+
                 const checkbox = document.getElementById(checkboxId);
                 checkbox.checked = false;
-            });
-        }
-        catch (e) {
-            console.log('Exception: ' + e);
-        }
+            }
+            catch (e) {
+                console.log('Exception: ' + e);
+            }
+        });
+
 
         let newDir = ''
         jwtToken = getCookie('jwtToken');
@@ -404,7 +407,7 @@ export default function UploadData() {
                     <div className='message-box' style={{ backgroundColor: 'lightpink' }}>
                         <div style={{ textAlign: 'center' }}>
                             <p>{errorMessage}</p>
-                            <div style={{position: "absolute", right: "12px", top: "20px", cursor: "pointer"}}>
+                            <div style={{ position: "absolute", right: "12px", top: "20px", cursor: "pointer" }}>
                                 <img src={hoveredErrPopup ? close_icon_hover : close_icon} alt="close-icon" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} onClick={handleCrossButtonClick} />
                             </div>
                         </div>
