@@ -13,8 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {NavLink} from "react-router-dom";
-import close_icon from '../assets/close_icon_u86.svg';
-import close_icon_hover from '../assets/close_icon_u86_mouseOver.svg';
+import close_icon from '../../assets/close_icon_u86.svg';
+import close_icon_hover from '../../assets/close_icon_u86_mouseOver.svg';
 import styled from 'styled-components';
 
 const FLASK_PREVIEW_DATASET_API = `http://${process.env.REACT_APP_HOST_URL}:5000`;
