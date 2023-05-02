@@ -20,9 +20,9 @@ import Team from './../pages/team'
 import Docs from './../pages/docs'
 import PreviewDatasets from '../pages/MyData/previewDatasets'
 import UploadData from './MyData/uploadData';
-import Login from '../pages/Login/login';
-import SignUp from '../pages/Login/signup';
-import RoutingTemplate from '../pages/Login/loginRouting';
+import Login from '../pages/login/login';
+import SignUp from '../pages/login/signup';
+import RoutingTemplate from '../pages/login/loginRouting';
 import ClusteringUsingRaceID from '../pages/MyData/Workflows/ClusteringUsingRaceID';
 import NormalizeUsingScanpy from '../pages/MyData/Tools/normalizeUsingScanpy';
 
