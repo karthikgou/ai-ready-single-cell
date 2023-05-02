@@ -915,7 +915,22 @@ Updates Page */
   justify-content: center;
 }
 
+.panel-icons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 5px;
+  height: 100%;
+  padding: 10px;
+  font-size: 20px;
+}
 
+.panel-icons svg {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
 
 
 

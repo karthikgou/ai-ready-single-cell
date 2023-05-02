@@ -232,6 +232,163 @@ app.post('/createDataset', (req, res) => {
     });
 });
 
+app.put('/updateDataset', async (req, res) => {
+
+    const { title, n_cells, reference, summary, authToken, files, currentFileList } = req.body;
+    const username = getUserFromToken(authToken);
+
+    const insertList = files.filter(item => !currentFileList.includes(item));
+    const deleteList = currentFileList.filter(item => !files.includes(item));
+
+    pool.getConnection(function (err, connection) {
+        if (err) throw err;
+
+        connection.beginTransaction(function (err) {
+            if (err) { console.log('Idi error: ' + err); throw err; }
+
+            // Run SELECT command
+            connection.query('SELECT user_id FROM users WHERE username = ? LIMIT 1', [username], function (err, userRows) {
+                if (err) {
+                    connection.rollback(function () {
+                        throw err;
+                    });
+                }
+
+                const userId = userRows[0].user_id;
+
+                if (!userId) {
+                    res.status(400).send('User not found');
+                    connection.rollback(function () {
+                        connection.release();
+                    });
+                    return;
+                }
+
+                connection.query('SELECT dataset_id FROM dataset WHERE user_id = ? and title = ? LIMIT 1', [userId, title], function (err, datasetRows) {
+                    if (err) {
+                        connection.rollback(function () {
+                            throw err;
+                        });
+                    }
+
+                    const datasetId = datasetRows[0].dataset_id;
+
+                    if (!datasetId) {
+                        res.status(400).send('Dataset not found');
+                        connection.rollback(function () {
+                            connection.release();
+                        });
+                        return;
+                    }
+
+                    connection.query('UPDATE dataset SET n_cells=?, reference=?, summary=? WHERE dataset_id=?', [n_cells, reference, summary, datasetId], function (err, datasetResult) {
+                        if (err) {
+
+                            connection.rollback(function () {
+                                throw err;
+                            });
+                        }
+                        for (const file of insertList) {
+                            connection.query('INSERT INTO file (file_loc, dataset_id) VALUES (?, ?)', [file, datasetId]);
+                        }
+
+                        for (const file of deleteList) {
+                            connection.query('DELETE FROM file WHERE file_loc=? AND dataset_id=?', [file, datasetId]);
+                        }
+
+                        // Commit transaction
+                        connection.commit(function (err) {
+                            if (err) {
+                                connection.rollback(function () {
+                                    throw err;
+                                });
+                            }
+
+                            console.log('Transaction completed successfully');
+                            connection.release();
+                            res.status(200).jsonp('Dataset Updated.');
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+
+app.delete('/deleteDataset', async (req, res) => {
+    const { authToken, dataset } = req.query;
+    const username = getUserFromToken(authToken);
+
+    pool.getConnection(function (err, connection) {
+        if (err) throw err;
+
+        connection.beginTransaction(function (err) {
+            if (err) { throw err; }
+
+            // Run SELECT command
+            connection.query('SELECT user_id FROM users WHERE username = ? LIMIT 1', [username], function (err, userRows) {
+                if (err) {
+                    connection.rollback(function () {
+                        throw err;
+                    });
+                }
+
+                const userId = userRows[0].user_id;
+
+                if (!userId) {
+                    res.status(400).send('User not found');
+                    connection.rollback(function () {
+                        connection.release();
+                    });
+                    return;
+                }
+
+                connection.query('SELECT dataset_id FROM dataset WHERE user_id = ? and title = ? LIMIT 1', [userId, dataset], function (err, datasetRows) {
+                    if (err) {
+                        connection.rollback(function () {
+                            throw err;
+                        });
+                    }
+
+                    const datasetId = datasetRows[0].dataset_id;
+
+                    if (!datasetId) {
+                        res.status(400).send('Dataset not found');
+                        connection.rollback(function () {
+                            connection.release();
+                        });
+                        return;
+                    }
+
+                    connection.query('delete FROM file WHERE dataset_id=?', [datasetId], function (err, datasetResult) {
+                        if (err) {
+
+                            connection.rollback(function () {
+                                throw err;
+                            });
+                        }
+                            connection.query('DELETE FROM dataset where dataset_id=?', [datasetId]);
+
+                        // Commit transaction
+                        connection.commit(function (err) {
+                            if (err) {
+                                connection.rollback(function () {
+                                    throw err;
+                                });
+                            }
+
+                            console.log('Transaction completed successfully');
+                            connection.release();
+                            res.status(200).jsonp('Dataset deleted.');
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+
+
 app.post('/renameFile', async (req, res) => {
     let { oldName } = req.query;
     let { newName } = req.query;

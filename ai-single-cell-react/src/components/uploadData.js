@@ -9,8 +9,10 @@ import UppyUploader from "./uppy";
 import Form from "@rjsf/core";
 import close_icon from '../assets/close_icon_u86.svg';
 import close_icon_hover from '../assets/close_icon_u86_mouseOver.svg';
+import { useLocation } from 'react-router-dom';
 
 import schema from "./uploadDataSchema.json";
+import updateSchema from "./updateDataSchema.json";
 import RightRail from "./rightRail";
 
 export default function UploadData() {
@@ -33,6 +35,10 @@ export default function UploadData() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
     const [hoveredErrPopup, setHoveredErrPopup] = useState(false);
+    const location = useLocation();
+    let mode = location.state?.mode || '';
+    let formInfo = location.state?.formInfo || '';
+    const [currentFileList, setCurrentFileList] = useState(formInfo?.files?.map(file => file.file_loc) || []);
 
     const handleMouseOver = () => {
         setHoveredErrPopup(true);
@@ -45,6 +51,20 @@ export default function UploadData() {
     const handleCrossButtonClick = () => {
         setErrorMessage('');
     }
+
+    useEffect(() => {
+        const hookForUpdate = async () => {
+          if (mode === 'update') {
+            console.log('Mode: ' + mode);
+            formInfo.reference = (formInfo.reference !== null) ? formInfo.reference : '';
+            formInfo.summary = (formInfo.summary !== null) ? formInfo.summary : '';
+            setSelectedFiles(currentFileList);
+            setFormData(formInfo);
+          }
+        };
+        hookForUpdate();
+      }, []);
+      
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -363,8 +383,33 @@ export default function UploadData() {
             setErrorMessage('Please log in first.');
             return;
         }
+
         formData['authToken'] = jwtToken;
         formData['files'] = selectedFiles;
+
+        if (mode === 'update') {
+            formData.currentFileList = currentFileList;
+            fetch(`${SERVER_URL}/updateDataset`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        navigate('/mydata/preview-datasets', { state: { message: 'Dataset updated successfully.' } });
+                    }
+                    else {
+                        console.log('Error updating dataset:', response);
+                    }
+                })
+                .catch(error => {
+                    setErrorMessage('Error updating dataset.');
+                    console.error('Error updating dataset:', error);
+                });
+                return;
+        }
         fetch(`${SERVER_URL}/createDataset`, {
             method: 'POST',
             headers: {
@@ -413,7 +458,7 @@ export default function UploadData() {
                         </div>
                     </div>)}
                 <div>
-                    <h2 style={{ textAlign: "left" }}><span>Input</span></h2>
+                    <h2 style={{ textAlign: "left" }}><span>{(mode === 'update' ? 'Update Dataset' : "Create Dataset")}</span></h2>
                     <div>        <div>
                         <div id="upload-data-div">
                             <b>Choose your files *</b> <br />
@@ -556,7 +601,7 @@ export default function UploadData() {
 
 
                         <Form
-                            schema={schema}
+                            schema={(mode === 'update') ? updateSchema : schema}
                             formData={formData}
                             onChange={({ formData }) => setFormData(formData)}
                             onSubmit={handleSubmit}
