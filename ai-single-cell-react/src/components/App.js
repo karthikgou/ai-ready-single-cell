@@ -20,9 +20,9 @@ import Team from './../pages/team'
 import Docs from './../pages/docs'
 import PreviewDatasets from '../pages/MyData/previewDatasets'
 import UploadData from './MyData/uploadData';
-import LoginPage from './../pages/Login/login';
-import Signup from './../pages/Login/signup';
-import RoutingTemplate from './../pages/Login/loginRouting';
+import Login from '../pages/Login/login';
+import SignUp from '../pages/Login/signup';
+import RoutingTemplate from '../pages/Login/loginRouting';
 import ClusteringUsingRaceID from '../pages/MyData/Workflows/ClusteringUsingRaceID';
 import NormalizeUsingScanpy from '../pages/MyData/Tools/normalizeUsingScanpy';
 
@@ -45,8 +45,8 @@ function App() {
           <Route path="mydata/tools" element={<NormalizeUsingScanpy/>}></Route>
           <Route path="team"         element={<Team/>}/>
           <Route path="docs"         element={<Docs/>}/>
-          <Route path="login"         element={<LoginPage/>}/>
-          <Route path="signup"         element={<Signup/>}/>
+          <Route path="login"         element={<Login/>}/>
+          <Route path="signup"         element={<SignUp/>}/>
           <Route path="routing"         element={<RoutingTemplate/>}/>
         </Route>
       </Routes>

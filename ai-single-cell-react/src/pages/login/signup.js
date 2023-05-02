@@ -1,6 +1,6 @@
 import Signup from "../../components/Authentication/signUp";
 
-export default function Login() {
+export default function SignUp() {
     return(
         <div className="page-container">
             <div className="left-nav">
