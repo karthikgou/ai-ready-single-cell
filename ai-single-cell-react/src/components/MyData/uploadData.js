@@ -12,6 +12,8 @@ import close_icon_hover from '../../assets/close_icon_u86_mouseOver.svg';
 
 import schema from "../../react-json-schema/uploadDataSchema.json";
 import RightRail from "../RightNavigation/rightRail";
+import { useLocation } from 'react-router-dom';
+import updateSchema from "./updateDataSchema.json";
 
 export default function UploadData() {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
@@ -33,6 +35,10 @@ export default function UploadData() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
     const [hoveredErrPopup, setHoveredErrPopup] = useState(false);
+    const location = useLocation();
+    let mode = location.state?.mode || '';
+    let formInfo = location.state?.formInfo || '';
+    const [currentFileList, setCurrentFileList] = useState(formInfo?.files?.map(file => file.file_loc) || []);
 
     const handleMouseOver = () => {
         setHoveredErrPopup(true);
@@ -45,6 +51,20 @@ export default function UploadData() {
     const handleCrossButtonClick = () => {
         setErrorMessage('');
     }
+
+    useEffect(() => {
+        const hookForUpdate = async () => {
+          if (mode === 'update') {
+            console.log('Mode: ' + mode);
+            formInfo.reference = (formInfo.reference !== null) ? formInfo.reference : '';
+            formInfo.summary = (formInfo.summary !== null) ? formInfo.summary : '';
+            setSelectedFiles(currentFileList);
+            setFormData(formInfo);
+          }
+        };
+        hookForUpdate();
+      }, []);
+      
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -92,14 +112,15 @@ export default function UploadData() {
 
     async function pushOrPopName(name) {
         name = name.replace("//", "/");
-        if (!tempFileList.includes(name)) {
+        const index = tempFileList.indexOf(name);
+        if (index === -1) {
             tempFileList.push(name);
+        } else {
+            tempFileList.splice(index, 1);
         }
-        else
-            tempFileList.pop(name)
         console.log('filesSelected: ' + tempFileList);
-
     }
+
 
     const handleUpdateText = (id, newText) => {
         fileNames.map((file, index) => {
@@ -157,15 +178,17 @@ export default function UploadData() {
 
     const fetchDirContents = async (subdir) => {
 
-        try {
-            enabledCheckboxes.forEach((checkboxId) => {
+        enabledCheckboxes.forEach((checkboxId) => {
+            try {
+
                 const checkbox = document.getElementById(checkboxId);
                 checkbox.checked = false;
-            });
-        }
-        catch (e) {
-            console.log('Exception: ' + e);
-        }
+            }
+            catch (e) {
+                console.log('Exception: ' + e);
+            }
+        });
+
 
         let newDir = ''
         jwtToken = getCookie('jwtToken');
@@ -360,8 +383,33 @@ export default function UploadData() {
             setErrorMessage('Please log in first.');
             return;
         }
+
         formData['authToken'] = jwtToken;
         formData['files'] = selectedFiles;
+
+        if (mode === 'update') {
+            formData.currentFileList = currentFileList;
+            fetch(`${SERVER_URL}/updateDataset`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        navigate('/mydata/preview-datasets', { state: { message: 'Dataset updated successfully.' } });
+                    }
+                    else {
+                        console.log('Error updating dataset:', response);
+                    }
+                })
+                .catch(error => {
+                    setErrorMessage('Error updating dataset.');
+                    console.error('Error updating dataset:', error);
+                });
+                return;
+        }
         fetch(`${SERVER_URL}/createDataset`, {
             method: 'POST',
             headers: {
@@ -404,13 +452,13 @@ export default function UploadData() {
                     <div className='message-box' style={{ backgroundColor: 'lightpink' }}>
                         <div style={{ textAlign: 'center' }}>
                             <p>{errorMessage}</p>
-                            <div style={{position: "absolute", right: "12px", top: "20px", cursor: "pointer"}}>
+                            <div style={{ position: "absolute", right: "12px", top: "20px", cursor: "pointer" }}>
                                 <img src={hoveredErrPopup ? close_icon_hover : close_icon} alt="close-icon" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} onClick={handleCrossButtonClick} />
                             </div>
                         </div>
                     </div>)}
                 <div>
-                    <h2 style={{ textAlign: "left" }}><span>Input</span></h2>
+                    <h2 style={{ textAlign: "left" }}><span>{(mode === 'update' ? 'Update Dataset' : "Create Dataset")}</span></h2>
                     <div>        <div>
                         <div id="upload-data-div">
                             <b>Choose your files *</b> <br />
@@ -553,7 +601,7 @@ export default function UploadData() {
 
 
                         <Form
-                            schema={schema}
+                            schema={(mode === 'update') ? updateSchema : schema}
                             formData={formData}
                             onChange={({ formData }) => setFormData(formData)}
                             onSubmit={handleSubmit}

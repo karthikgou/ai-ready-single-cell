@@ -39,6 +39,7 @@ function App() {
           <Route path="leaderboards" element={<Leaderboards/>}/>
           <Route path="mydata"       element={<MyData/>}></Route>
           <Route path="mydata/upload-data"       element={<UploadData/>}></Route>
+          <Route path="mydata/update-dataset"       element={<UploadData/>}></Route>
           <Route path="mydata/preview-datasets" element={<PreviewDatasets/>}></Route>
           <Route path="mydata/workflows" element={<ClusteringUsingRaceID/>}></Route>
           <Route path="mydata/tools" element={<NormalizeUsingScanpy/>}></Route>
