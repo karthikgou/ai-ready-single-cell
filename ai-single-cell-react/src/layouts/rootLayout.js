@@ -1,6 +1,6 @@
 import {Outlet, NavLink} from "react-router-dom"
-import Authentication from "../components/AuthForm";
-import SearchBox from "../components/searchBar"
+import Authentication from "../components/Authentication/AuthForm";
+import SearchBox from "../components/Header/searchBar"
 import React, { useState, useEffect } from "react";
 import { deleteCookie, getCookie } from "../utils/utilFunctions";
 import { useNavigate } from 'react-router-dom';

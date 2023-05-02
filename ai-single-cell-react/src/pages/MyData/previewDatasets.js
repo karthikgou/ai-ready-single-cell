@@ -1,5 +1,5 @@
-import { Preview } from "../components/previewDatasets"
-import RightRail from "../components/rightRail"
+import { Preview } from "../../components/MyData/previewDatasets"
+import RightRail from "../../components/RightNavigation/rightRail"
 import { useLocation } from 'react-router-dom';
 
 export default function PreviewDatasets() {

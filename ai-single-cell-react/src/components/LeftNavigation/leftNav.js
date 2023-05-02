@@ -1,5 +1,5 @@
 import React from "react";
-import SearchBox from "./searchBar";
+import SearchBox from "../Header/searchBar";
 
 function LeftNav() {
   return (

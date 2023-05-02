@@ -915,6 +915,135 @@ Updates Page */
   justify-content: center;
 }
 
+.category {
+  border-left-width: 4px;
+  border-left-color: #e9ecef;
+}
+
+#root_clustering, #root_outliers, #root_tSNEAndFR, #root_extraParameters, #root_methodUsedForNormalization {
+  padding: 0px;
+  margin: 0px;
+}
+
+#root_clustering legend, #root_outliers legend, #root_tSNEAndFR legend, #root_extraParameters legend, #root_methodUsedForNormalization legend{
+  background: #e9ecef  ;
+  width: 100%;
+  padding: 10px 10px;
+  font-weight: bolder;
+  color: #2c3143;
+}
+
+.sub-category {
+  padding-left: 10px;
+}
+.control-label {
+  font-weight: bolder;
+}
+
+.default-class {
+  margin-left: 10px;
+}
+
+.default-class label{
+  background: #e9ecef  ;
+  width: 100%;
+  padding: 10px 10px;
+  font-weight: bolder;
+}
+
+.default-class select,
+.default-class p{
+  margin-left: 10px;
+  width: 98.5% !important;
+}
+
+/* .field-description {
+  padding-left: 10px;
+} */
+
+.common-class-tools-and-workflows .form-group {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.common-class-tools-and-workflows label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.common-class-tools-and-workflows input,
+.common-class-tools-and-workflows select,
+.common-class-tools-and-workflows textarea {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+  .common-class-tools-and-workflows select option {
+    padding: 5px; /* Add some padding to each option */
+    margin: 5px 0;
+  }
+
+  .common-class-tools-and-workflows input:focus,
+  .common-class-tools-and-workflows select:focus,
+  .common-class-tools-and-workflows textarea:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  .common-class-tools-and-workflows button[type="submit"] {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+  .common-class-tools-and-workflows button[type="submit"]:hover {
+    color: #fff;
+    background-color: #0069d9;
+    border-color: #0062cc;
+  }
+  .common-class-tools-and-workflows .separator {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 1rem auto 1fr;
+    margin-bottom: 0.5rem;
+    gap: 1rem;
+  }
+
+  .common-class-tools-and-workflows .separator .stripe {
+    background-color: rgb(222, 226, 230);
+    display: block;
+    height: 1px;
+}
+
+.common-class-tools-and-workflows .h-sm {
+  line-height: 1.2;
+  font-weight: 700;
+  font-size: 1.0625rem;
+}
+
+
 
 
 

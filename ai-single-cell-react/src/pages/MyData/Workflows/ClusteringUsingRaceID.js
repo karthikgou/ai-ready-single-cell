@@ -1,14 +1,13 @@
-// import LeftNav from "../components/leftNav";
-import RightRail from "../components/RightNavigation/rightRail";
+import { ClusteringUsingRaceIDComponent } from "../../../components/MyData/Workflows/clusteringUsingRaceID"
+import RightRail from "../../../components/RightNavigation/rightRail"
 
-export default function Leaderboards() {
+export default function ClusteringUsingRaceID() {
     return(
         <div className="page-container">
             <div className="left-nav">
-                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
-                <h1>I'm inside Leaderboards page</h1>
+                <ClusteringUsingRaceIDComponent />
             </div>
             <div className="right-rail">
                 <RightRail />

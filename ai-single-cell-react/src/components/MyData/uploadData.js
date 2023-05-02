@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ModalWindow.css';
 import { red } from "@mui/material/colors";
-import { getCookie } from '../utils/utilFunctions';
+import { getCookie } from '../../utils/utilFunctions';
 import UppyUploader from "./uppy";
 import Form from "@rjsf/core";
-import close_icon from '../assets/close_icon_u86.svg';
-import close_icon_hover from '../assets/close_icon_u86_mouseOver.svg';
+import close_icon from '../../assets/close_icon_u86.svg';
+import close_icon_hover from '../../assets/close_icon_u86_mouseOver.svg';
 
-import schema from "./uploadDataSchema.json";
-import RightRail from "./rightRail";
+import schema from "../../react-json-schema/uploadDataSchema.json";
+import RightRail from "../RightNavigation/rightRail";
 
 export default function UploadData() {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import LeftNav from "../components/leftNav";
-import RightRail from "../components/rightRail";
+import LeftNav from "../components/LeftNavigation/leftNav";
+import RightRail from "../components/RightNavigation/rightRail";
 
 const UPDATES_PAGE_API = `http://${process.env.REACT_APP_HOST_URL}:8055`
 

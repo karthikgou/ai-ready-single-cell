@@ -6,7 +6,7 @@ import {
   AccordionSummary,
   AccordionDetails
 } from '@material-ui/core';
-import { getCookie, isUserAuth } from '../utils/utilFunctions';
+import { getCookie, isUserAuth } from '../../utils/utilFunctions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';

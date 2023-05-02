@@ -1,4 +1,4 @@
-import LoginPage from "../../components/logIn";
+import LoginPage from "../../components/Authentication/logIn";
 
 export default function Login(props) {
     return(

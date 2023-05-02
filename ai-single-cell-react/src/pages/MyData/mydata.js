@@ -1,7 +1,7 @@
 // import LeftNav from "../components/leftNav";
-import RightRail from "../components/rightRail";
-import StorageChart from "../components/storageChart";
-import { getCookie } from "../utils/utilFunctions";
+import RightRail from "../../components/RightNavigation/rightRail";
+import StorageChart from "../../components/MyData/storageChart";
+import { getCookie } from "../../utils/utilFunctions";
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 

@@ -1,5 +1,5 @@
 // import LeftNav from "../components/leftNav";
-import RightRail from "../components/rightRail";
+import RightRail from "../components/RightNavigation/rightRail";
 
 export default function Competitions() {
     return(

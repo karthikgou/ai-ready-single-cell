@@ -15,14 +15,16 @@ import Competitions from './../pages/competitions'
 import Updates from './../pages/updates'
 import Benchmarks from './../pages/benchmarks'
 import Leaderboards from './../pages/leaderboards'
-import MyData from './../pages/mydata'
+import MyData from '../pages/MyData/mydata'
 import Team from './../pages/team'
 import Docs from './../pages/docs'
-import PreviewDatasets from './../pages/previewDatasets'
-import UploadData from './uploadData';
-import LoginPage from '../pages/login/login';
-import Signup from '../pages/login/signup';
-import RoutingTemplate from '../pages/login/loginRouting';
+import PreviewDatasets from '../pages/MyData/previewDatasets'
+import UploadData from './MyData/uploadData';
+import LoginPage from '../pages/Login/login';
+import Signup from '../pages/Login/signup';
+import RoutingTemplate from '../pages/Login/loginRouting';
+import ClusteringUsingRaceID from '../pages/MyData/Workflows/ClusteringUsingRaceID';
+import NormalizeUsingScanpy from '../pages/MyData/Tools/normalizeUsingScanpy';
 
 function App() {
 
@@ -38,6 +40,8 @@ function App() {
           <Route path="mydata"       element={<MyData/>}></Route>
           <Route path="mydata/upload-data"       element={<UploadData/>}></Route>
           <Route path="mydata/preview-datasets" element={<PreviewDatasets/>}></Route>
+          <Route path="mydata/workflows" element={<ClusteringUsingRaceID/>}></Route>
+          <Route path="mydata/tools" element={<NormalizeUsingScanpy/>}></Route>
           <Route path="team"         element={<Team/>}/>
           <Route path="docs"         element={<Docs/>}/>
           <Route path="login"         element={<LoginPage/>}/>
