@@ -26,10 +26,10 @@ DROP TABLE IF EXISTS `dataset`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dataset` (
   `dataset_id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(45) NOT NULL,
+  `title` varchar(200) NOT NULL,
   `n_cells` int NOT NULL,
-  `reference` varchar(100) DEFAULT NULL,
-  `summary` varchar(200) DEFAULT NULL,
+  `reference` TEXT DEFAULT NULL,
+  `summary` TEXT DEFAULT NULL,
   `user_id` int NOT NULL,
   PRIMARY KEY (`dataset_id`),
   UNIQUE KEY `title_UNIQUE` (`title`),
