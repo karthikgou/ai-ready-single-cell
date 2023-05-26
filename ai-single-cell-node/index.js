@@ -93,6 +93,20 @@ app.post('/api/signup', (req, res) => {
                 if (!err) {
                     if (!fs.existsSync(storageDir + username))
                         fs.promises.mkdir(storageDir + username);
+
+                    // Create JWT token and send it back to the client
+                    const jwtToken = jwt.sign({ username, password }, 'secret', { expiresIn: '1h' });
+
+                    // the cookie will be set with the name "jwtToken" and the value of the token
+                    // the "httpOnly" and "secure" options help prevent XSS and cookie theft
+                    // the "secure" option is only set if the app is running in production mode
+                    // set the cookie with the JWT token on the response object
+                    res.cookie("jwtToken", jwtToken, {
+                        //httpOnly: true,
+                        maxAge: 60 * 60 * 1000,
+                        path: "/"
+                        //secure: process.env.NODE_ENV === "production",
+                    });
                     res.json({ status: 200, message: 'User account created successfully' });
                 }
             }
@@ -136,7 +150,7 @@ app.post('/api/login', (req, res) => {
 
             // Create JWT token and send it back to the client
             const jwtToken = jwt.sign({ username, password }, 'secret', { expiresIn: '1h' });
-
+            
             // the cookie will be set with the name "jwtToken" and the value of the token
             // the "httpOnly" and "secure" options help prevent XSS and cookie theft
             // the "secure" option is only set if the app is running in production mode
@@ -792,6 +806,26 @@ app.get('/preview/datasets', (req, res) => {
         }
     });
 });
+
+
+// Define API endpoint
+app.get('/api/tools/leftnav', function(req, res) {
+    // Query the category and filter tables and group the filters by category
+    const sql = 'SELECT c.id AS category_id, c.name AS category_name, ' +
+                'JSON_ARRAYAGG(f.name) AS filters ' +
+                'FROM categories c ' +
+                'LEFT JOIN filters f ON c.id = f.category_id ' +
+                'GROUP BY c.id ' +
+                'ORDER BY c.id ASC';
+    pool.query(sql, function(error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      } else {
+        res.json(results);
+      }
+    });
+  });
 
 // Start the server
 const PORT = process.env.PORT || 3001;

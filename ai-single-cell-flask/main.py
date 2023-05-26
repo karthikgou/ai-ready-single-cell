@@ -8,6 +8,7 @@ from flask_htmlmin import HTMLMIN
 from constants import USER_STORAGE_PATH
 from rpy2.robjects import pandas2ri
 pandas2ri.activate()
+import os
 
 
 
@@ -36,15 +37,50 @@ def previewDatasets():
     files = req_data['files']
     username = req_data['username']
 
+    # Extract the filenames
+    filenames = [os.path.basename(file['file_loc']) for file in files]
+    file_paths = [file['file_loc'] for file in files]
+
      # create user directory to read the file contents
     user_directory = USER_STORAGE_PATH + "/" + username
+
+    # Check the existence of the files
+    for file_path in file_paths:
+        if not os.path.exists(user_directory + file_path):
+            error_message = f"File {file_path} does not exist."
+            response = jsonify(error=error_message)
+            response.status_code = 404  # Not Found status code
+            return response
+        
+    # All files exist, proceed with reading the contents
+    molecules_filename = "molecules.txt"
+    annotations_filename = "annotation.txt"
 
     # create parent directory to read the file contents
     parent_directory = USER_STORAGE_PATH + "/" + username + "/" + path
 
-    r_file_path = ro.StrVector([parent_directory])
-    ro.globalenv["r_file_path"] = r_file_path
-
+    if molecules_filename in filenames:
+        molecules_path = file_paths[filenames.index(molecules_filename)]
+        absolute_molecules_path = user_directory + molecules_path
+        molecules_file_path = ro.StrVector([absolute_molecules_path])
+        ro.globalenv["molecules_file_path"] = molecules_file_path
+    else:
+        error_message = "molecules.txt file is missing. We need both annotation.txt and molecules.txt files for QC Single Cell Experiment. Please provide the files to preview"
+        response = jsonify(error=error_message)
+        response.status_code = 400  # Bad Request status code
+        return response
+        
+    if annotations_filename in filenames:
+        annotations_path = file_paths[filenames.index(annotations_filename)]
+        absolute_annotation_path = user_directory + annotations_path
+        annotation_file_path = ro.StrVector([absolute_annotation_path])
+        ro.globalenv["annotation_file_path"] = annotation_file_path
+    else:
+        error_message = "annotation.txt file is missing. We need both annotation.txt and molecules.txt files for QC Single Cell Experiment. Please provide the files to preview"
+        response = jsonify(error=error_message)
+        response.status_code = 400  # Bad Request status code
+        return response
+    
     # Load the CSV file into an R dataframe
     ro.r('''
         library(scater)
@@ -54,10 +90,10 @@ def previewDatasets():
         library(EnsDb.Hsapiens.v86)
      ''')
     ro.r(f'''
-    molecules <- read.delim(file.path(r_file_path,"molecules.txt"), sep = "\t", row.names = 1, stringsAsFactors = FALSE)
+    molecules <- read.delim(molecules_file_path, sep = "\t", row.names = 1, stringsAsFactors = FALSE)
     ''')
     ro.r(
-        f'annotation <- read.delim(file.path(r_file_path,"annotation.txt"), sep = "\t", stringsAsFactors = T)')
+        f'annotation <- read.delim(annotation_file_path, sep = "\t", stringsAsFactors = T)')
     r_molecules_df = ro.globalenv['molecules']
     r_annotations_df = ro.globalenv['annotation']
     
@@ -100,7 +136,8 @@ def previewDatasets():
     r_columns = ro.globalenv['temp4']
     r_is_mitro = ro.globalenv['temp5']
 
-    return render_template('previewDatasets.html', pandas_annotation_df=pandas_annotation_df, pandas_molecules_df=pandas_molecules_df, r_table_geneNames=r_table_geneNames,r_grep_not_mt=r_grep_not_mt,r_grep_not_rpls=r_grep_not_rpls, r_grep_atp8=r_grep_atp8, r_columns=r_columns, r_is_mitro=r_is_mitro)
+
+    return render_template('previewDatasets.html', pandas_annotation_df=pandas_annotation_df, pandas_molecules_df=pandas_molecules_df, r_table_geneNames=r_table_geneNames,r_grep_not_mt=r_grep_not_mt,r_grep_not_rpls=r_grep_not_rpls, r_grep_atp8=r_grep_atp8, r_columns=r_columns, r_is_mitro=r_is_mitro, absolute_annotation_path=absolute_annotation_path, absolute_molecules_path=absolute_molecules_path)
 
 
 if __name__ == "__main__":

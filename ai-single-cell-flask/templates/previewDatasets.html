@@ -24,7 +24,7 @@
     <div class="sourceCode" id="cb240">
         <button type="button" class="copy-to-clipboard-button" title="Copy to clipboard" aria-label="Copy to clipboard"><i class="fa fa-copy"></i></button>
 
-        <pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="basic-quality-control-qc-and-exploration-of-scrna-seq-datasets.html#cb240-1" aria-hidden="true" tabindex="-1"></a>molecules <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/tung/molecules.txt"</span>,<span class="at">row.names=</span><span class="dv">1</span>)</span><br><span id="cb240-2"><a href="basic-quality-control-qc-and-exploration-of-scrna-seq-datasets.html#cb240-2" aria-hidden="true" tabindex="-1"></a>annotation <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/tung/annotation.txt"</span>,<span class="at">stringsAsFactors =</span> T)</span></code></pre>
+        <pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="basic-quality-control-qc-and-exploration-of-scrna-seq-datasets.html#cb240-1" aria-hidden="true" tabindex="-1"></a>molecules <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">{{absolute_molecules_path}}</span>,<span class="at">row.names=</span><span class="dv">1</span>)</span><br><span id="cb240-2"><a href="basic-quality-control-qc-and-exploration-of-scrna-seq-datasets.html#cb240-2" aria-hidden="true" tabindex="-1"></a>annotation <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">{{absolute_annotation_path}}</span>,<span class="at">stringsAsFactors =</span> T)</span></code></pre>
     </div>
 
 

@@ -1,12 +1,13 @@
 import React , { useState }from 'react';
-import {NavLink} from "react-router-dom"
-
+import {NavLink} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const SIGNUP_API_URL = `http://${process.env.REACT_APP_HOST_URL}:3001/api/signup`;
 
 
 function Signup (props){
 
+  const navigate = useNavigate();
 
   const [isSignedUp, setIsSignedUp] = useState(false);
 
@@ -66,12 +67,14 @@ function Signup (props){
           email: formData.email,
           password: formData.password,
             }),
-        // credentials: "include"
+        credentials: "include"
       })
         .then(response => response.json())
         .then(data => {
           if (data.status === 200) {
             setIsSignedUp(true);
+            navigate("/getStarted");
+            window.location.reload();
           } else {
             setErrorMessage(data.message);
           } 
@@ -84,13 +87,6 @@ function Signup (props){
 
   return (
     <div className='signup-container comn-container-auth'>
-      {isSignedUp ?
-          <div>
-            <p>Thank you for signing up!</p>
-            <p>Your account has been created successfully.</p>
-            <p>Please log in to continue - <NavLink to="/login" className="span-class-link">Log in</NavLink></p>
-        </div> 
-        :
       <div className='inner-container-auth'>
           <h1>Sign Up</h1>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod</p>
@@ -123,7 +119,6 @@ function Signup (props){
           Already have an account? <NavLink to="/login" className="span-class-link">Log in</NavLink>
         </p>
         </div>
-}
 </div>
 );
 };
