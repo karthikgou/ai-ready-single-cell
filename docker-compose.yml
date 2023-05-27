@@ -47,6 +47,7 @@ services:
       - oscb_mysql
     volumes:
       - user_storage:/usr/src/app/storage/
+      - intermediate_files:/usr/src/app/temp
     networks:
       - ai-single-cell
 
@@ -92,8 +93,23 @@ services:
     volumes:
       - user_storage:/usr/src/app/storage/
 
+  oscb_fastapi:
+    build:
+      context: ./ai-single-cell-fastapi
+    container_name: oscb_fastapi_container
+    image: oscb_fastapi
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - ai-single-cell
+    volumes:
+      - user_storage:/app/storage/
+      - intermediate_files:/app/temp
+
 volumes:
   user_storage: {}
+  intermediate_files: {}
 
 networks:
   ai-single-cell:

@@ -25,6 +25,9 @@ import SignUp from '../pages/login/signup';
 import RoutingTemplate from '../pages/login/loginRouting';
 import ClusteringUsingRaceID from '../pages/MyData/Workflows/ClusteringUsingRaceID';
 import NormalizeUsingScanpy from '../pages/MyData/Tools/normalizeUsingScanpy';
+import CreateTask from '../pages/createTask';
+import MyTasks from '../pages/myTasks';
+import ResultFiles from '../pages/ResultFiles';
 
 function App() {
 
@@ -48,6 +51,9 @@ function App() {
           <Route path="login"         element={<Login/>}/>
           <Route path="signup"         element={<SignUp/>}/>
           <Route path="routing"         element={<RoutingTemplate/>}/>
+          <Route path="createTask"         element={<CreateTask/>}/>
+          <Route path="myTasks"         element={<MyTasks/>}/>
+          <Route path="resultfiles"         element={<ResultFiles/>}/>
         </Route>
       </Routes>
     </BrowserRouter>

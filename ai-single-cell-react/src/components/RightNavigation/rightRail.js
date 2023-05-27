@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faArrowRightArrowLeft , faPlus, faCaretDown, faPen, faDatabase, faLocationDot, faArrowsRotate, faSquareCheck, faCompress, faGear, faChevronDown, faCross, faXmark, faAngleDoubleDown} from "@fortawesome/free-solid-svg-icons";
 import SearchBox from "../Header/searchBar";
+import MyTasksSideNav from "../MyData/myTasksSideNav";
 
 function RightRail() {
   return (
@@ -55,9 +56,10 @@ function RightRail() {
             </div>
 
         </div>
-        <div className="results-window">
+        <MyTasksSideNav/>
+        {/* <div className="results-window">
 
-        </div>
+        </div> */}
     </div>
   );
 }

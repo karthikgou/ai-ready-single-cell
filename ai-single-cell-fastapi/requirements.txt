@@ -1,0 +1,8 @@
+numpy
+uvicorn
+fastapi
+celery
+scanpy
+starlette
+redis
+matplotlib

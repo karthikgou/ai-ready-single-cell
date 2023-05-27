@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 const dbConfig = JSON.parse(fs.readFileSync('./configs/dbconfigs.json'));
 const storageConfig = JSON.parse(fs.readFileSync('./configs/storageConfig.json'));
-const { storageDir, storageAllowance } = storageConfig;
+const { storageDir, storageAllowance, intermediateStorage } = storageConfig;
 
 // Create a connection pool to handle multiple connections to the database
 const pool = mysql.createPool({
@@ -150,7 +150,7 @@ app.post('/api/login', (req, res) => {
 
             // Create JWT token and send it back to the client
             const jwtToken = jwt.sign({ username, password }, 'secret', { expiresIn: '1h' });
-            
+
             // the cookie will be set with the name "jwtToken" and the value of the token
             // the "httpOnly" and "secure" options help prevent XSS and cookie theft
             // the "secure" option is only set if the app is running in production mode
@@ -381,7 +381,7 @@ app.delete('/deleteDataset', async (req, res) => {
                                 throw err;
                             });
                         }
-                            connection.query('DELETE FROM dataset where dataset_id=?', [datasetId]);
+                        connection.query('DELETE FROM dataset where dataset_id=?', [datasetId]);
 
                         // Commit transaction
                         connection.commit(function (err) {
@@ -493,15 +493,21 @@ app.post('/download', async (req, res) => {
 });
 
 app.get('/download', async (req, res) => {
-    const { fileUrl, authToken } = req.query;
+    const { fileUrl, authToken, forResultFile } = req.query;
     const username = getUserFromToken(authToken);
+    let filePath = '';
     console.log('Entered download function');
 
     if (!fileUrl) {
         return res.status(400).jsonp('Invalid request');
     }
 
-    const filePath = `${storageDir}/${username}/${fileUrl}`
+    if (!forResultFile)
+        filePath = `${storageDir}/${username}/${fileUrl}`;
+    else
+        filePath = `${intermediateStorage}/${fileUrl}`;
+
+    console.log('file: ' + filePath);
     const fileStat = await fs.promises.stat(filePath);
 
     if (fileStat.isFile()) {
@@ -527,6 +533,51 @@ app.get('/download', async (req, res) => {
         res.setHeader('Content-type', 'application/zip');
 
         archive.finalize();
+    } else {
+        return res.status(400).jsonp('Invalid request');
+    }
+});
+
+app.get('/fetchPreview', async (req, res) => {
+    const { fileUrl, authToken, forResultFile } = req.query;
+    const username = getUserFromToken(authToken);
+    let filePath = '';
+    console.log('Entered download function');
+
+    if (!fileUrl) {
+        return res.status(400).jsonp('Invalid request');
+    }
+
+    if (!forResultFile)
+        filePath = `${storageDir}/${username}/${fileUrl}`;
+    else
+        filePath = `${intermediateStorage}/${fileUrl}`;
+
+    console.log('file: ' + filePath);
+    const fileStat = await fs.promises.stat(filePath);
+
+    if (fileStat.isFile()) {
+        // Read first 100 lines of the file
+        const fileStream = fs.createReadStream(filePath, { encoding: 'utf8' });
+        let lines = '';
+
+        fileStream.on('data', (data) => {
+            lines += data;
+
+            // Check if 100 lines have been read
+            if (lines.split('\n').length >= 20) {
+                fileStream.destroy();
+            }
+        });
+
+        fileStream.on('close', () => {
+            res.status(200).send(lines);
+        });
+
+        fileStream.on('error', (error) => {
+            console.log('Error reading file: ' + error);
+            res.status(500).jsonp('Error reading file');
+        });
     } else {
         return res.status(400).jsonp('Invalid request');
     }
@@ -596,12 +647,10 @@ const formatDate = (dateString) => {
     return formattedDate;
 }
 
-
 app.get('/getDirContents', async (req, res) => {
     try {
         console.log(`HOSTURL: ${process.env.HOST_URL}`);
-        const { dirPath } = req.query;
-        const { authToken } = req.query;
+        const { dirPath, authToken, usingFor } = req.query;
 
         let uid = getUserFromToken(authToken);
         if (uid == "Unauthorized") {
@@ -609,10 +658,14 @@ app.get('/getDirContents', async (req, res) => {
         }
 
         subdir = req.query.subdir;
-        console.log(req.query.subdir);
-        var directoryPath = path.join(storageDir + uid + "/" + dirPath + "/");
-        if (subdir != undefined)
-            directoryPath = path.join(storageDir + uid + "/", subdir);
+
+        if (usingFor === 'resultFiles')
+            var directoryPath = path.join(intermediateStorage + "/" + dirPath + "/");
+        else {
+            var directoryPath = path.join(storageDir + uid + "/" + dirPath + "/");
+            if (subdir != undefined)
+                directoryPath = path.join(storageDir + uid + "/", subdir);
+        }
         const directoryContents = fs.readdirSync(directoryPath);
         const dirList = [];
         const fileList = [];
@@ -641,7 +694,6 @@ app.get('/getDirContents', async (req, res) => {
     }
 
 });
-
 
 
 app.post('/upload', async (req, res) => {
@@ -809,24 +861,157 @@ app.get('/preview/datasets', (req, res) => {
 
 
 // Define API endpoint
-app.get('/api/tools/leftnav', function(req, res) {
+app.get('/api/tools/leftnav', function (req, res) {
     // Query the category and filter tables and group the filters by category
     const sql = 'SELECT c.id AS category_id, c.name AS category_name, ' +
-                'JSON_ARRAYAGG(f.name) AS filters ' +
-                'FROM categories c ' +
-                'LEFT JOIN filters f ON c.id = f.category_id ' +
-                'GROUP BY c.id ' +
-                'ORDER BY c.id ASC';
-    pool.query(sql, function(error, results, fields) {
-      if (error) {
-        console.log(error);
-        res.status(500).send('Internal server error');
-      } else {
-        res.json(results);
-      }
+        'JSON_ARRAYAGG(f.name) AS filters ' +
+        'FROM categories c ' +
+        'LEFT JOIN filters f ON c.id = f.category_id ' +
+        'GROUP BY c.id ' +
+        'ORDER BY c.id ASC';
+    pool.query(sql, function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+        } else {
+            res.json(results);
+        }
     });
-  });
+});
 
+app.post('/createTask', (req, res) => {
+    const { authToken, workflow, taskId } = req.body;
+    const username = getUserFromToken(authToken);
+
+    pool.getConnection(function (err, connection) {
+        if (err) throw err;
+
+        connection.beginTransaction(function (err) {
+            if (err) throw err;
+
+            connection.query('SELECT user_id FROM users WHERE username = ? LIMIT 1', [username], function (err, userRows) {
+                if (err) {
+                    connection.rollback(function () {
+                        throw err;
+                    });
+                }
+
+                const userId = userRows[0].user_id;
+
+                if (!userId) {
+                    res.status(400).send('User not found');
+                    connection.rollback(function () {
+                        connection.release();
+                    });
+                    return;
+                }
+
+                const date = new Date();
+                const timestamp = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
+                connection.query('INSERT INTO task (user_id, dataset_id, task_id, workflow, created_datetime) VALUES (?, ?, ?, ?, ?)', [userId, 31, taskId, workflow, timestamp], function (err, taskResult) {
+                    if (err) {
+                        connection.rollback(function () {
+                            throw err;
+                        });
+                    } else {
+                        const taskId = taskResult.insertId;
+
+                        // Commit transaction
+                        connection.commit(function (err) {
+                            if (err) {
+                                connection.rollback(function () {
+                                    throw err;
+                                });
+                            }
+
+                            console.log('Transaction completed successfully');
+                            connection.release();
+                            res.status(201).jsonp('Task Created.');
+                        });
+                    }
+                });
+            });
+        });
+    });
+});
+
+app.put('/updateTaskStatus', (req, res) => {
+    const { taskIds, status } = req.body;
+    const taskIdsArr = taskIds.split(',');
+
+    pool.getConnection(function (err, connection) {
+        if (err) throw err;
+
+        connection.beginTransaction(function (err) {
+            if (err) throw err;
+
+            const date = new Date();
+            const timestamp = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
+            connection.query('UPDATE task SET status = ?, finish_datetime = ? WHERE task_id IN (?)', [status, timestamp, taskIdsArr], function (err, taskResult) {
+                if (err) {
+                    connection.rollback(function () {
+                        throw err;
+                    });
+                } else {
+                    // Commit transaction
+                    connection.commit(function (err) {
+                        if (err) {
+                            connection.rollback(function () {
+                                throw err;
+                            });
+                        }
+
+                        console.log('Transaction completed successfully');
+                        connection.release();
+                        res.status(200).jsonp('Task status updated.');
+                    });
+                }
+            });
+        });
+    });
+});
+
+app.get('/getTasks', (req, res) => {
+    const { authToken } = req.query;
+    const username = getUserFromToken(authToken);
+
+    pool.getConnection(function (err, connection) {
+        if (err) throw err;
+
+        connection.beginTransaction(function (err) {
+            if (err) throw err;
+
+            connection.query('SELECT user_id FROM users WHERE username = ? LIMIT 1', [username], function (err, userRows) {
+                if (err) {
+                    connection.rollback(function () {
+                        throw err;
+                    });
+                }
+
+                const userId = userRows[0].user_id;
+
+                if (!userId) {
+                    res.status(400).send('User not found');
+                    connection.rollback(function () {
+                        connection.release();
+                    });
+                    return;
+                }
+
+                connection.query('SELECT task_id, workflow, dataset_id, status, created_datetime, finish_datetime FROM task WHERE user_id = ?', [userId], function (err, rows) {
+                    if (err) {
+                        connection.rollback(function () {
+                            throw err;
+                        });
+                    } else {
+                        connection.release();
+                        res.json(rows);
+                    }
+                });
+            });
+        });
+    });
+});
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
