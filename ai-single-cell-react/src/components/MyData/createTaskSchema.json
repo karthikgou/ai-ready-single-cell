@@ -1,0 +1,27 @@
+{
+    "title": "Create New Task",
+    "type": "object",
+    "required": [],
+    "properties": {
+        "dataset": {
+            "type": "string",
+            "title": "Dataset",
+            "enum": [],
+            "default": "Please select a dataset.",
+            "transformErrors": {
+                "Error: Failed to fetch datasets": "Failed to fetch datasets. Please try again later."
+            }
+        },
+        "workflow": {
+            "type": "string",
+            "title": "Workflow",
+            "enum": [
+                "Please select a workflow.",
+                "ScanpyQC",
+                "DropkickQC",
+                "FailingTask"
+            ],
+            "default": "Please select a workflow."
+        }
+    }
+}

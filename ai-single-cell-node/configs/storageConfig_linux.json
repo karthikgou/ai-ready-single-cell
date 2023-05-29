@@ -1,4 +1,5 @@
 {
     "storageDir": "/usr/src/app/storage/",
-    "storageAllowance": 5
+    "storageAllowance": 5,
+    "intermediateStorage": "/usr/src/app/temp/"
 }
