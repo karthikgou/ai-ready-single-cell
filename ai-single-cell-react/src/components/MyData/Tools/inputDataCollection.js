@@ -53,7 +53,7 @@ export default function InputDataComponent(props) {
                     <select onChange={handleDatasetChange}>
                         <option value="">Select the dataset from the list</option>
                         {datasets.map((dataset) => (
-                            <option value={JSON.stringify(dataset.files)}>{dataset.title}</option>
+                            <option value={JSON.stringify(dataset)}>{dataset.title}</option>
                         ))}
                     </select>
                     {props.formErrors && <FormHelperText>{props.formErrors}</FormHelperText>}

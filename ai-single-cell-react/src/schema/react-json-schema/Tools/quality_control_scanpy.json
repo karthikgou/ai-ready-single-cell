@@ -5,9 +5,7 @@
       "type":"object",
       "title": "Parameters for Quality Control",  
       "required": [
-        "methods",
-        "output"
-      ],
+        "methods"      ],
       "properties": {
         "methods": {
           "type": "array",
@@ -19,15 +17,11 @@
           "default": ["Scanpy"],
           "uniqueItems": true
         },
-        "output": { 
-          "type": "string" ,
-          "title": "Output Path",
-           "description": "Some more details about the parameter"
-        },
         "output_format": { 
           "type": "string",
           "title": "Output Format",
-          "description": "Some more details about the parameter"
+          "description": "Some more details about the parameter",
+          "enum": [".h5ad", ".rds", ".h5Seurat"]
          },
         "default_assay": { 
           "type": "string",

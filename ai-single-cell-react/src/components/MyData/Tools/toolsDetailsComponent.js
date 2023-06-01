@@ -23,11 +23,10 @@ export default function ToolsDetailsComponent(props) {
     const uiSchema = {
       "parameters": {
         "classNames": "category",
-          "output": {
-            "classNames": "sub-category"
-          },
           "output_format": {
-            "classNames": "sub-category"
+            "classNames": "sub-category",
+            "ui:widget": "select",
+            "ui:placeholder": "Select file format"
           },
           "methods": {
             "classNames": "sub-category",
@@ -100,7 +99,15 @@ export default function ToolsDetailsComponent(props) {
           console.log("Failed to submit the form");
         } else {
             const parsedSelectedDataset = JSON.parse(selectedDataset);
-            formData.input = parsedSelectedDataset.map(file => file.file_loc).join(",");
+            formData.dataset = parsedSelectedDataset.title;
+
+            if (parsedSelectedDataset.files.length > 1) {
+              const fileLocParts = parsedSelectedDataset.files[0].file_loc.split('/');
+              fileLocParts.shift(); // Remove the first empty element
+              formData.input = '/' + fileLocParts[0];
+            } else if(parsedSelectedDataset.files.length === 1) {
+              formData.input = parsedSelectedDataset.files[0].file_loc;
+            }
             console.log(formData);
             setFormErrors("");
           }
