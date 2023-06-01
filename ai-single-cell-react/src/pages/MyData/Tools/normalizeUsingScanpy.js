@@ -27,18 +27,10 @@ export default function NormalizeUsingScanpy() {
             <div className="left-nav border-r left-nav-background">
                 <LeftNav handleFilterSelection={handleFilterSelection}/>
             </div>
-            {/* <div className="main-content">
-                <NormalizeUsingScanpyComponent />
-            </div> */}
-            
       {/* Render the selected filter details in the middle of the page */}
       {selectedFilter && (
-        <div>
-          {/* Render the form using the loaded filter schema */}
-
-        <div>
+        <div className="filter-details-tools main-content">
           <ToolsDetailsComponent filter={selectedFilter} />
-        </div>
         </div>
       )}
        {!selectedFilter && (

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Form from 'react-jsonschema-form';
 import Toggle from 'react-toggle';
 import 'react-toggle/style.css';
+import InputDataComponent from './inputDataCollection';
 
 export default function ToolsDetailsComponent(props) {
     const filterName = props.filter;
@@ -14,58 +15,72 @@ export default function ToolsDetailsComponent(props) {
     let jwtToken = getCookie('jwtToken');
     const [formData, setFormData] = useState({});
     const [filterSchema, setFilterSchema] = useState(null);
+    const [selectedDataset, setSelectedDataset] = useState([]);
+    const [formErrors, setFormErrors] = useState("");
 
     const navigate = useNavigate();
 
     const uiSchema = {
-        "methodUsedForNormalization": {
-          "classNames": "category",
-          "method": {
-            "classNames": "sub-category",
-            "ui:widget": "select",
-            "ui:options": {
-              "placeholder": "Select a distance metric",
-              "enumOptions": [
-                { "label": "Euclidean", "value": "euclidean" },
-                { "label": "Manhattan", "value": "manhattan" },
-                { "label": "Cosine", "value": "cosine" }
-              ]
-            }
-          },
-          "targetSum": {
-            "ui:widget": "updown",
+      "parameters": {
+        "classNames": "category",
+          "output": {
             "classNames": "sub-category"
-            // "ui:options": {
-            //   "placeholder": "Select a clustering method",
-            //   "enumOptions": [
-            //     { "label": "Hierarchical", "value": "hierarchical" },
-            //     { "label": "K-Means", "value": "kmeans" },
-            //     { "label": "DBSCAN", "value": "dbscan" }
-              // ]
-            },
-          "excludeParam": {
-            "ui:widget": "select",
-            "classNames": "category default-class",
-            "ui:options": {
-              "classNames": "sub-category",
-              "enumOptions": [
-                { "label": "Yes", "value": "Yes" },
-                { "label": "No", "value": "No" }
-              ]
-            }
           },
-          "nameOfTheField": {
+          "output_format": {
+            "classNames": "sub-category"
+          },
+          "methods": {
+            "classNames": "sub-category",
+            // "ui:widget": "select",
+            "ui:placeholder": "Select a method",
+            'ui:widget': () => (
+              <div className='common-row-wrap'>
+                <select>
+                  <option>Scanpy</option>
+                </select>
+          </div>
+            ),
+          },
+          "default_assay": {
+            "classNames": "sub-category",
+            'ui:widget': () => (
+              <div className='common-row-wrap'>
+                <span data-v-22825496="" class="ui-form-title-message warning"> * Optional </span>
+                <input type='text' />
+          </div>
+            ),
+          },
+          "layer": {
+            "classNames": "sub-category"
+          },
+          "path_of_scrublet_calls": {
+            "classNames": "sub-category"
+          },
+          "species": {
+            "classNames": "sub-category",
+            "ui:placeholder": "Select species type"
+          },
+          "idtype": {
+            "classNames": "sub-category"
+          },
+          "genes": {
             "classNames": "sub-category",
           },
-          "layersToNormalize": {
+          "ncores": {
             "classNames": "sub-category",
+            "ui:widget": "range",
           },
-          "howTONormalizeLayers": {
+          "show_umap": {
             "classNames": "sub-category",
-          }   
-        }  
-      };
-
+            "ui:widget": "toggle"
+          },
+          "show_error": {
+            "classNames": "sub-category",
+            "ui:widget": "toggle"
+          }
+      }
+    };
+    
       const widgets = {
         toggle: (props) => (
           <Toggle
@@ -75,15 +90,41 @@ export default function ToolsDetailsComponent(props) {
         ),
       };
 
+      const onSubmit = ({ formData }) => {
+        // Handle form submission here
+        formData = formData.parameters;
+
+        // Perform form validation and set formErrors accordingly
+        if(selectedDataset.length === 0) {
+          setFormErrors("Please select a dataset before submitting the form");
+          console.log("Failed to submit the form");
+        } else {
+            const parsedSelectedDataset = JSON.parse(selectedDataset);
+            formData.input = parsedSelectedDataset.map(file => file.file_loc).join(",");
+            console.log(formData);
+            setFormErrors("");
+          }
+      };
+
+      const handleDatasetChange = event => {
+        let value = event.target.value;
+        if(value !== "") {
+          setSelectedDataset(event.target.value);
+        } else {
+          setSelectedDataset([]);
+        }
+      };
+
 
   useEffect(() => {
-    import(`./../../../react-json-schema/Tools/${filterName}.json`)
+    import(`./../../../schema/react-json-schema/Tools/${filterName}.json`)
     .then((module) => {
       setFilterSchema(module.default);
       console.log(filterSchema);
     })
     .catch((error) => {
       console.error('Error loading filter schema:', error);
+      setFilterSchema(null);
     });
   }, [filterName, filterSchema]);
 
@@ -96,6 +137,10 @@ export default function ToolsDetailsComponent(props) {
           </h2> 
         <div className="stripe"></div>
       </div>
+      {/* {formErrors && <span className="error">{formErrors}</span>} */}
+      <div>
+        <InputDataComponent handleDatasetChange={handleDatasetChange} formErrors={formErrors}/>
+      </div>
             
         {filterSchema ? (
             <Form
@@ -104,6 +149,7 @@ export default function ToolsDetailsComponent(props) {
             widgets={widgets}
             onChange={({ formData }) => setFormData(formData)}
             uiSchema={uiSchema}
+            onSubmit={onSubmit}
         />
           ) : (
             <div>No Schema for this tool.</div>

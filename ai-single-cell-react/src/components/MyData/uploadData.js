@@ -10,7 +10,7 @@ import Form from "@rjsf/core";
 import close_icon from '../../assets/close_icon_u86.svg';
 import close_icon_hover from '../../assets/close_icon_u86_mouseOver.svg';
 
-import schema from "../../react-json-schema/uploadDataSchema.json";
+import schema from "../../schema/react-json-schema/uploadDataSchema.json";
 import RightRail from "../RightNavigation/rightRail";
 import { useLocation } from 'react-router-dom';
 import updateSchema from "./../updateDataSchema.json";

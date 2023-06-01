@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCookie} from '../../../utils/utilFunctions';
 import { useNavigate } from 'react-router-dom';
-import schema from '../../../react-json-schema/Tools/normalizeUsingScanpySchema.json';
+import schema from '../../../schema/react-json-schema/Tools/normalizeUsingScanpySchema.json';
 import Form from 'react-jsonschema-form';
 import Toggle from 'react-toggle';
 import 'react-toggle/style.css';

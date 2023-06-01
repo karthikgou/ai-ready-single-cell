@@ -248,7 +248,7 @@ export default function RootLayout() {
              </div>
              <div className="main-container">
                  <main>
-                     <Outlet />
+                     <Outlet isUserLoggedIn={isUserLoggedIn}/>
                  </main>
              </div>
          </div>

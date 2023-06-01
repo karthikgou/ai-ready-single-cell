@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCookie} from '../../../utils/utilFunctions';
 import { useNavigate } from 'react-router-dom';
-import schema from '../../../react-json-schema/Workflows/clusteringUsingRaceIDSchema.json';
+import schema from '../../../schema/react-json-schema/Workflows/clusteringUsingRaceIDSchema.json';
 import Form from 'react-jsonschema-form';
 import styled from 'styled-components';
 import { Container, Button } from "reactstrap";

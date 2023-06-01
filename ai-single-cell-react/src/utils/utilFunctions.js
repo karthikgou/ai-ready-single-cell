@@ -1,4 +1,4 @@
-import {LOGIN_API_URL} from '../constants/declarations'
+import {LOGIN_API_URL, SERVER_URL} from '../constants/declarations'
 
 // Get the value of a cookie with a given name
 export function getCookie(name) {
@@ -52,3 +52,33 @@ export function deleteCookie(name) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/`;
   return true;
 }
+
+
+export async function getStorageDetails(jwtToken) {
+  try {
+    const response = await fetch(`${SERVER_URL}/getStorageDetails?authToken=${jwtToken}`);
+
+    if (response.status === 403) {
+      throw new Error('Please log in first');
+    }
+
+    const data = await response.json();
+
+    return {
+      usedStorage: data.used,
+      totalStorage: data.allowed
+    };
+  } catch (error) {
+    if (error.message === 'Please log in first') {
+      window.alert('Please log in first');
+    } else {
+      console.error(error);
+    }
+
+    return {
+      usedStorage: 0,
+      totalStorage: 0
+    };
+  }
+}
+
