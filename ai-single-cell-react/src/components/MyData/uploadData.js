@@ -14,6 +14,7 @@ import schema from "../../schema/react-json-schema/uploadDataSchema.json";
 import RightRail from "../RightNavigation/rightRail";
 import { useLocation } from 'react-router-dom';
 import updateSchema from "./../updateDataSchema.json";
+import FilePreviewModal from "./filePreviewModal";
 
 export default function UploadData() {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
@@ -39,6 +40,8 @@ export default function UploadData() {
     let mode = location.state?.mode || '';
     let formInfo = location.state?.formInfo || '';
     const [currentFileList, setCurrentFileList] = useState(formInfo?.files?.map(file => file.file_loc) || []);
+    const [previewBoxOpen, setPreviewBoxOpen] = useState(false);
+    const [fileToPreview, setFileToPreview] = useState(null);
 
     const handleMouseOver = () => {
         setHoveredErrPopup(true);
@@ -52,19 +55,24 @@ export default function UploadData() {
         setErrorMessage('');
     }
 
+    const handleFileClick = async (fileName) => {
+        setFileToPreview(`${pwd}/${fileName}`);
+        setPreviewBoxOpen(true);
+    };
+
     useEffect(() => {
         const hookForUpdate = async () => {
-          if (mode === 'update') {
-            console.log('Mode: ' + mode);
-            formInfo.reference = (formInfo.reference !== null) ? formInfo.reference : '';
-            formInfo.summary = (formInfo.summary !== null) ? formInfo.summary : '';
-            setSelectedFiles(currentFileList);
-            setFormData(formInfo);
-          }
+            if (mode === 'update') {
+                console.log('Mode: ' + mode);
+                formInfo.reference = (formInfo.reference !== null) ? formInfo.reference : '';
+                formInfo.summary = (formInfo.summary !== null) ? formInfo.summary : '';
+                setSelectedFiles(currentFileList);
+                setFormData(formInfo);
+            }
         };
         hookForUpdate();
-      }, []);
-      
+    }, []);
+
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -106,8 +114,12 @@ export default function UploadData() {
     };
 
     useEffect(() => {
-        getStorageDetails();
-        fetchDirContents();
+        if (jwtToken) {
+            getStorageDetails();
+            fetchDirContents();
+        }
+        else
+            navigate('/routing');
     }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
@@ -205,7 +217,7 @@ export default function UploadData() {
         else
             newDir = pwd
 
-        fetch(`${SERVER_URL}/getDirContents?dirPath=${newDir}&authToken=${jwtToken}`)
+        fetch(`${SERVER_URL}/getDirContents?dirPath=${newDir}&authToken=${jwtToken}&usingFor=userstorage`)
             .then(response => {
                 if (response.status === 403) {
                     throw new Error('Please log in first');
@@ -408,7 +420,7 @@ export default function UploadData() {
                     setErrorMessage('Error updating dataset.');
                     console.error('Error updating dataset:', error);
                 });
-                return;
+            return;
         }
         fetch(`${SERVER_URL}/createDataset`, {
             method: 'POST',
@@ -459,6 +471,132 @@ export default function UploadData() {
                     </div>)}
                 <div>
                     <h2 style={{ textAlign: "left" }}><span>{(mode === 'update' ? 'Update Dataset' : "Create Dataset")}</span></h2>
+                    {previewBoxOpen && <FilePreviewModal selectedFile={fileToPreview} setPreviewBoxOpen={setPreviewBoxOpen} jwtToken={jwtToken} forResultFile={false} />}
+                    {isFileManagerOpen && (
+                        <div className="modal">
+                            <div>
+                                <button type="button" className="fileManagerButton" onClick={() => setIsNewDirOn(true)} >
+                                    <FontAwesomeIcon icon={faPlus} /> New Folder
+                                </button> &nbsp;&nbsp;
+                                <button type="button" className="fileManagerButton" onClick={() => downloadFiles(selectedFiles)} >
+                                    <FontAwesomeIcon icon={faDownload} /> Download
+                                </button>&nbsp;&nbsp;
+                                <button type="button" className="fileManagerButton" onClick={() => { deleteFiles(selectedFiles); }} >
+                                    <FontAwesomeIcon icon={faTrash} color={red} /> Delete
+                                </button>&nbsp;&nbsp;
+                                <button type="button" className="fileManagerButton" onClick={() => { fetchDirContents() }} >
+                                    <FontAwesomeIcon icon={faRefresh} color={red} /> Refresh
+                                </button></div>
+                            <div className="modal-content" style={{ overflowX: "hidden", overflowY: "hidden" }}>
+                                <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
+                                    <div style={{ paddingLeft: '15%', width: "45%" }}>Name</div>
+                                    <div style={{ width: "25%" }}>Type</div>
+                                    <div style={{ width: "25%", paddingLeft: "5%" }}>Time Created</div>
+                                </div>
+                                <div className="modal-content-scroll">
+                                    <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
+                                        <div style={{ paddingLeft: '16%', width: "40%" }} onClick={() => fetchDirContents('..')}><FontAwesomeIcon icon={faTurnUp} /></div>
+                                    </div>
+                                    {dirNames.map((dir, index) => (
+                                        <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                                            <FontAwesomeIcon icon={faFolder} onClick={log} /> &nbsp;&nbsp;
+                                            <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`d${index}`); }} /> &nbsp;&nbsp;
+                                            <input type='checkbox' id={`dirCheckbox${index + 1}`} className="selectFiles" align='center' onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `dirCheckbox${index + 1}`]); await pushOrPopName(pwd + '/' + dir.name) }}></input>
+                                            {selectedItemId === `d${index}` ? (
+                                                <input type="text" defaultValue={dir.name} onKeyDown={(event) => {
+                                                    if (event.key === 'Enter') {
+                                                        handleUpdateText(`d${index}`, event.target.value);
+                                                    }
+                                                }} onBlur={(event) => {
+                                                    handleUpdateText(`d${index}`, event.target.value);
+                                                }}
+                                                    autoFocus
+                                                />
+                                            ) : (
+                                                <div style={{ paddingLeft: '6%', width: "40%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    <a style={{ color: "black", textDecoration: "none" }} title={dir.name} onClick={() => { fetchDirContents(dir.name); }}>
+                                                        {dir.name}
+                                                    </a>
+                                                </div>
+                                            )}
+                                            <div style={{ paddingLeft: '4%', width: "25%" }}>Folder</div>
+                                            <div style={{ paddingLeft: '5%', width: "25%" }}>{dir.created}</div>
+                                        </div>
+                                    ))}
+                                    <div>
+                                        {fileNames.map((file, index) => (
+                                            <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                                                <FontAwesomeIcon icon={faFile} /> &nbsp;&nbsp;&nbsp;
+                                                <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`f${index}`); }} /> &nbsp;&nbsp;
+                                                <input type='checkbox' id={`fileCheckbox${index + 1}`} className="selectFiles" onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `fileCheckbox${index + 1}`]); await pushOrPopName(pwd + '/' + file.name); }}></input>
+                                                {selectedItemId === `f${index}` ? (
+                                                    <input type="text" defaultValue={file.name} onKeyDown={(event) => {
+                                                        if (event.key === 'Enter') {
+                                                            handleUpdateText(`f${index}`, event.target.value);
+                                                        }
+                                                    }} onBlur={(event) => {
+                                                        handleUpdateText(`f${index}`, event.target.value);
+                                                    }}
+                                                        autoFocus
+                                                    />
+                                                ) : (
+                                                    <div style={{ paddingLeft: '6%', width: "40%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} id={`fid${index + 1}`}>
+                                                        <span title={file.name} onClick={() => {
+                                                            handleFileClick(file.name);
+                                                        }}>
+                                                            {file.name}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                <div style={{ paddingLeft: '4%', width: "25%" }}>{file.type + "File"}</div>
+                                                <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
+                                            </div>
+                                        ))}
+                                        {isNewDirOn && (
+                                            <div className="modal-item">
+                                                <input
+                                                    type="text"
+                                                    defaultValue="New Folder"
+                                                    onKeyDown={(event) => {
+                                                        if (event.key === 'Enter') {
+                                                            createNewFolder(event.target.value);
+                                                        } else if (event.key === 'Escape') {
+                                                            setIsNewDirOn(false);
+                                                        }
+                                                    }}
+                                                    onBlur={(event) => {
+                                                        if (isNewDirOn) createNewFolder(event.target.value);
+                                                    }}
+                                                    autoFocus
+                                                    onFocus={(event) => {
+                                                        event.target.select();
+                                                    }}
+                                                />  &nbsp;&nbsp;
+                                                <FontAwesomeIcon
+                                                    icon={faXmark}
+                                                    style={{ fontWeight: "bold", cursor: "pointer" }}
+                                                    onMouseDown={(event) => {
+                                                        event.preventDefault();
+                                                        setIsNewDirOn(false);
+                                                    }}
+                                                />
+                                            </div>
+                                        )}
+                                        <div style={{ height: "20px" }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ paddingTop: "7px" }}><button className="fileManagerButton" onClick={() => { setPwd('/'); setSelectedFiles(tempFileList); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
+                                <button className="fileManagerButton" onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} > <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
+                                {isUppyModalOpen && (
+                                    <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} freeSpace={totalStorage - usedStorage} />
+                                )}
+                                <button className="fileManagerButton" onClick={async () => {
+                                    await setTempFileList([]); setSelectedFiles([]); toggleModal(); setPwd('/')
+                                }} > <FontAwesomeIcon icon={faXmark} style={{ fontWeight: "bold" }} /> Close</button></div>
+                        </div>)
+                    }
                     <div>        <div>
                         <div id="upload-data-div">
                             <b>Choose your files *</b> <br />
@@ -472,129 +610,7 @@ export default function UploadData() {
                             <button type="button" onClick={toggleModal} style={{ fontSize: "1em", padding: "10px", borderRadius: "5px" }}>
                                 <FontAwesomeIcon icon={faFolderOpen} />
                             </button>
-                            {isFileManagerOpen && (
-                                <div className="modal">
-                                    <div>
-                                        <button type="button" className="fileManagerButton" onClick={() => setIsNewDirOn(true)} >
-                                            <FontAwesomeIcon icon={faPlus} /> New Folder
-                                        </button> &nbsp;&nbsp;
-                                        <button type="button" className="fileManagerButton" onClick={() => downloadFiles(selectedFiles)} >
-                                            <FontAwesomeIcon icon={faDownload} /> Download
-                                        </button>&nbsp;&nbsp;
-                                        <button type="button" className="fileManagerButton" onClick={() => { deleteFiles(selectedFiles); }} >
-                                            <FontAwesomeIcon icon={faTrash} color={red} /> Delete
-                                        </button>&nbsp;&nbsp;
-                                        <button type="button" className="fileManagerButton" onClick={() => { fetchDirContents() }} >
-                                            <FontAwesomeIcon icon={faRefresh} color={red} /> Refresh
-                                        </button></div>
-                                    <div className="modal-content" style={{ overflowX: "hidden", overflowY: "hidden" }}>
-                                        <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
-                                            <div style={{ paddingLeft: '15%', width: "45%" }}>Name</div>
-                                            <div style={{ width: "25%" }}>Type</div>
-                                            <div style={{ width: "25%", paddingLeft: "5%" }}>Time Created</div>
-                                        </div>
-                                        <div className="modal-content-scroll">
-                                            <div className="modal-item" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: 10 }}>
-                                                <div style={{ paddingLeft: '16%', width: "40%" }} onClick={() => fetchDirContents('..')}><FontAwesomeIcon icon={faTurnUp} /></div>
-                                            </div>
-                                            {dirNames.map((dir, index) => (
-                                                <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                                                    <FontAwesomeIcon icon={faFolder} onClick={log} /> &nbsp;&nbsp;
-                                                    <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`d${index}`); }} /> &nbsp;&nbsp;
-                                                    <input type='checkbox' id={`dirCheckbox${index + 1}`} className="selectFiles" align='center' onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `dirCheckbox${index + 1}`]); await pushOrPopName(pwd + '/' + dir.name) }}></input>
-                                                    {selectedItemId === `d${index}` ? (
-                                                        <input type="text" defaultValue={dir.name} onKeyDown={(event) => {
-                                                            if (event.key === 'Enter') {
-                                                                handleUpdateText(`d${index}`, event.target.value);
-                                                            }
-                                                        }} onBlur={(event) => {
-                                                            handleUpdateText(`d${index}`, event.target.value);
-                                                        }}
-                                                            autoFocus
-                                                        />
-                                                    ) : (
-                                                        <div style={{ paddingLeft: '6%', width: "40%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                            <a style={{ color: "black", textDecoration: "none" }} title={dir.name} onClick={() => { fetchDirContents(dir.name); }}>
-                                                                {dir.name}
-                                                            </a>
-                                                        </div>
-                                                    )}
-                                                    <div style={{ paddingLeft: '4%', width: "25%" }}>Folder</div>
-                                                    <div style={{ paddingLeft: '5%', width: "25%" }}>{dir.created}</div>
-                                                </div>
-                                            ))}
-                                            <div>
-                                                {fileNames.map((file, index) => (
-                                                    <div className="modal-item" key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                                                        <FontAwesomeIcon icon={faFile} /> &nbsp;&nbsp;&nbsp;
-                                                        <FontAwesomeIcon icon={faPencil} id={`fedit${index + 1}`} onClick={() => { handleRenameIcon(`f${index}`); }} /> &nbsp;&nbsp;
-                                                        <input type='checkbox' id={`fileCheckbox${index + 1}`} className="selectFiles" onChange={async () => { setEnabledCheckboxes([...enabledCheckboxes, `fileCheckbox${index + 1}`]); await pushOrPopName(pwd + '/' + file.name); }}></input>
-                                                        {selectedItemId === `f${index}` ? (
-                                                            <input type="text" defaultValue={file.name} onKeyDown={(event) => {
-                                                                if (event.key === 'Enter') {
-                                                                    handleUpdateText(`f${index}`, event.target.value);
-                                                                }
-                                                            }} onBlur={(event) => {
-                                                                handleUpdateText(`f${index}`, event.target.value);
-                                                            }}
-                                                                autoFocus
-                                                            />
-                                                        ) : (
-                                                            <div style={{ paddingLeft: '6%', width: "40%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} id={`fid${index + 1}`}>
-                                                                <span title={file.name}>
-                                                                    {file.name}
-                                                                </span>
-                                                            </div>
-                                                        )}
 
-                                                        <div style={{ paddingLeft: '4%', width: "25%" }}>{file.type + "File"}</div>
-                                                        <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
-                                                    </div>
-                                                ))}
-                                                {isNewDirOn && (
-                                                    <div className="modal-item">
-                                                        <input
-                                                            type="text"
-                                                            defaultValue="New Folder"
-                                                            onKeyDown={(event) => {
-                                                                if (event.key === 'Enter') {
-                                                                    createNewFolder(event.target.value);
-                                                                } else if (event.key === 'Escape') {
-                                                                    setIsNewDirOn(false);
-                                                                }
-                                                            }}
-                                                            onBlur={(event) => {
-                                                                if (isNewDirOn) createNewFolder(event.target.value);
-                                                            }}
-                                                            autoFocus
-                                                            onFocus={(event) => {
-                                                                event.target.select();
-                                                            }}
-                                                        />  &nbsp;&nbsp;
-                                                        <FontAwesomeIcon
-                                                            icon={faXmark}
-                                                            style={{ fontWeight: "bold", cursor: "pointer" }}
-                                                            onMouseDown={(event) => {
-                                                                event.preventDefault();
-                                                                setIsNewDirOn(false);
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )}
-                                                <div style={{ height: "20px" }}></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style={{ paddingTop: "7px" }}><button className="fileManagerButton" onClick={() => { setPwd('/'); setSelectedFiles(tempFileList); toggleModal(); }} ><FontAwesomeIcon icon={faCheck} style={{ fontWeight: "bold" }} /> Select Files</button>&nbsp;&nbsp;
-                                        <button className="fileManagerButton" onClick={() => { setIsUppyModalOpen(!isUppyModalOpen) }} > <FontAwesomeIcon icon={faArrowAltCircleUp} /> Upload Here </button>&nbsp;&nbsp;
-                                        {isUppyModalOpen && (
-                                            <UppyUploader isUppyModalOpen={isUppyModalOpen} setIsUppyModalOpen={setIsUppyModalOpen} pwd={pwd} authToken={jwtToken} freeSpace={totalStorage - usedStorage} />
-                                        )}
-                                        <button className="fileManagerButton" onClick={async () => {
-                                            await setTempFileList([]); setSelectedFiles([]); toggleModal(); setPwd('/')
-                                        }} > <FontAwesomeIcon icon={faXmark} style={{ fontWeight: "bold" }} /> Close</button></div>
-                                </div>)
-                            }
                         </div>
                         <br />
                         <h2 style={{ textAlign: "left" }}><span>Parameters</span></h2>

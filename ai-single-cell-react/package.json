@@ -47,7 +47,10 @@
     "remark-gfm": "^3.0.1",
     "remark-unwrap-images": "^3.0.1",
     "styled-components": "^5.3.9",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "intl": "^1.2.5",
+    "react-table": "^7.8.0",
+    "socket.io-client": "^4.6.1"
   },
   "scripts": {
     "start": "REACT_APP_HOST_URL=$HOST_URL react-scripts start",
