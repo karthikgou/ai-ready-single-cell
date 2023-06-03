@@ -179,6 +179,84 @@ app.get('/protected', verifyToken, (req, res) => {
     });
 });
 
+app.post('/createTask', (req, res) => {
+    const { authToken, workflow, taskId, dataset } = req.body;
+    if(dataset === 'Please select a dataset.') {
+        res.status(400).jsonp('Bad Request');
+        return;
+    }
+    const username = getUserFromToken(authToken);
+
+    pool.getConnection(function (err, connection) {
+        if (err) throw err;
+
+        connection.beginTransaction(function (err) {
+            if (err) throw err;
+
+            connection.query('SELECT user_id FROM users WHERE username = ? LIMIT 1', [username], function (err, userRows) {
+                if (err) {
+                    connection.rollback(function () {
+                        throw err;
+                    });
+                }
+
+                const userId = userRows[0].user_id;
+
+                if (!userId) {
+                    res.status(400).send('User not found');
+                    connection.rollback(function () {
+                        connection.release();
+                    });
+                    return;
+                }
+
+                connection.query('SELECT dataset_id FROM dataset WHERE user_id = ? AND title = ?', [userId, dataset], function (err, datasetRows) {
+                    if (err) {
+                        connection.rollback(function () {
+                            throw err;
+                        });
+                    }
+
+                    const datasetId = datasetRows[0].dataset_id;
+
+                    if (!datasetId) {
+                        res.status(400).send('Dataset not found');
+                        connection.rollback(function () {
+                            connection.release();
+                        });
+                        return;
+                    }
+
+                    const date = new Date();
+                    const timestamp = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
+                    connection.query('INSERT INTO task (user_id, dataset_id, task_id, workflow, created_datetime) VALUES (?, ?, ?, ?, ?)', [userId, datasetId, taskId, workflow, timestamp], function (err, taskResult) {
+                        if (err) {
+                            connection.rollback(function () {
+                                throw err;
+                            });
+                        } else {
+                            const taskId = taskResult.insertId;
+
+                            // Commit transaction
+                            connection.commit(function (err) {
+                                if (err) {
+                                    connection.rollback(function () {
+                                        throw err;
+                                    });
+                                }
+
+                                console.log('Transaction completed successfully');
+                                connection.release();
+                                res.status(201).jsonp('Task Created.');
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    });
+});
+
 app.post('/createDataset', (req, res) => {
 
     const { title, n_cells, reference, summary, authToken, files } = req.body;
