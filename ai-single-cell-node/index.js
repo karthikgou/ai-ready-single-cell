@@ -181,7 +181,7 @@ app.get('/protected', verifyToken, (req, res) => {
 
 app.post('/createTask', (req, res) => {
     const { authToken, workflow, taskId, dataset } = req.body;
-    if(dataset === 'Please select a dataset.') {
+    if (dataset === 'Please select a dataset.') {
         res.status(400).jsonp('Bad Request');
         return;
     }
@@ -481,6 +481,38 @@ app.delete('/deleteDataset', async (req, res) => {
 });
 
 
+// app.post('/renameFile', async (req, res) => {
+//     let { oldName } = req.query;
+//     let { newName } = req.query;
+//     let { authToken } = req.query;
+
+//     oldName = oldName.replace('//', '/');
+//     newName = newName.replace('//', '/');
+
+//     const uname = getUserFromToken(authToken);
+//     if (uname == 'Unauthorized')
+//         return res.status(403).jsonp('Unauthorized');
+
+//     pool.query(`UPDATE aisinglecell.file f JOIN aisinglecell.dataset d ON f.dataset_id = d.dataset_id JOIN aisinglecell.users u ON d.user_id = u.user_id SET f.file_loc = CONCAT('${newName}', SUBSTRING(f.file_loc, LENGTH('${oldName}') + 1)) WHERE u.username = '${uname}' AND f.file_loc LIKE '${oldName}%';`, [newName, oldName, uname, oldName + '%'], (err, results) => {
+
+//         console.log(results);
+//         if (err) {
+//             console.error(err);
+//             res.json({ status: 500, message: 'Internal Server Error' });
+//             return;
+//         }
+//     })
+
+//     fs.rename(`${storageDir}${uname}/${oldName}`, `${storageDir}${uname}/${newName}`, (err) => {
+//         if (err) {
+//             console.error(err);
+//         } else {
+//             console.log('File renamed successfully!');
+//         }
+//     });
+//     return res.status(200).jsonp('Ok');
+// });
+
 app.post('/renameFile', async (req, res) => {
     let { oldName } = req.query;
     let { newName } = req.query;
@@ -493,25 +525,28 @@ app.post('/renameFile', async (req, res) => {
     if (uname == 'Unauthorized')
         return res.status(403).jsonp('Unauthorized');
 
-    pool.query(`UPDATE aisinglecell.file f JOIN aisinglecell.dataset d ON f.dataset_id = d.dataset_id JOIN aisinglecell.users u ON d.user_id = u.user_id SET f.file_loc = CONCAT('${newName}', SUBSTRING(f.file_loc, LENGTH('${oldName}') + 1)) WHERE u.username = '${uname}' AND f.file_loc LIKE '${oldName}%';`, [newName, oldName, uname, oldName + '%'], (err, results) => {
-
-        console.log(results);
+    pool.query(`SELECT f.file_loc FROM aisinglecell.file f JOIN aisinglecell.dataset d ON f.dataset_id = d.dataset_id JOIN aisinglecell.users u ON d.user_id = u.user_id WHERE u.username = '${uname}' AND f.file_loc LIKE '${oldName}%';`, (err, results) => {
         if (err) {
             console.error(err);
-            res.json({ status: 500, message: 'Internal Server Error' });
-            return;
+            return res.status(500).json({ status: 500, message: 'Internal Server Error' });
         }
-    })
 
-    fs.rename(`${storageDir}${uname}/${oldName}`, `${storageDir}${uname}/${newName}`, (err) => {
-        if (err) {
-            console.error(err);
+        if (results.length > 0) {
+            return res.status(409).json({ status: 409, message: 'Directory already exists' });
         } else {
-            console.log('File renamed successfully!');
+            fs.rename(`${storageDir}${uname}/${oldName}`, `${storageDir}${uname}/${newName}`, (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ status: 500, message: 'Internal Server Error' });
+                } else {
+                    console.log('File renamed successfully!');
+                    return res.status(200).jsonp('Ok');
+                }
+            });
         }
     });
-    return res.status(200).jsonp('Ok');
 });
+
 
 app.post('/download', async (req, res) => {
     const { fileList } = req.body;
@@ -728,7 +763,7 @@ const formatDate = (dateString) => {
 app.get('/getDirContents', async (req, res) => {
     try {
         console.log(`HOSTURL: ${process.env.HOST_URL}`);
-        const { dirPath, authToken, usingFor } = req.query;
+        const { dirPath, authToken } = req.query;
 
         let uid = getUserFromToken(authToken);
         if (uid == "Unauthorized") {
@@ -736,14 +771,9 @@ app.get('/getDirContents', async (req, res) => {
         }
 
         subdir = req.query.subdir;
-
-        if (usingFor === 'resultFiles')
-            var directoryPath = path.join(intermediateStorage + "/" + dirPath + "/");
-        else {
-            var directoryPath = path.join(storageDir + uid + "/" + dirPath + "/");
-            if (subdir != undefined)
-                directoryPath = path.join(storageDir + uid + "/", subdir);
-        }
+        var directoryPath = path.join(storageDir + uid + "/" + dirPath + "/");
+        if (subdir != undefined)
+            directoryPath = path.join(storageDir + uid + "/", subdir);
         const directoryContents = fs.readdirSync(directoryPath);
         const dirList = [];
         const fileList = [];
@@ -958,7 +988,7 @@ app.get('/api/tools/leftnav', function (req, res) {
 });
 
 app.post('/createTask', (req, res) => {
-    const { authToken, workflow, taskId } = req.body;
+    const { authToken, workflow, taskId, output_path } = req.body;
     const username = getUserFromToken(authToken);
 
     pool.getConnection(function (err, connection) {
@@ -986,7 +1016,7 @@ app.post('/createTask', (req, res) => {
 
                 const date = new Date();
                 const timestamp = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
-                connection.query('INSERT INTO task (user_id, dataset_id, task_id, workflow, created_datetime) VALUES (?, ?, ?, ?, ?)', [userId, 31, taskId, workflow, timestamp], function (err, taskResult) {
+                connection.query('INSERT INTO task (user_id, dataset_id, task_id, workflow, created_datetime, output_path) VALUES (?, ?, ?, ?, ?, ?)', [userId, 31, taskId, workflow, timestamp, output_path], function (err, taskResult) {
                     if (err) {
                         connection.rollback(function () {
                             throw err;
@@ -1076,7 +1106,7 @@ app.get('/getTasks', (req, res) => {
                     return;
                 }
 
-                connection.query('SELECT task_id, workflow, dataset_id, status, created_datetime, finish_datetime FROM task WHERE user_id = ?', [userId], function (err, rows) {
+                connection.query('SELECT task_id, workflow, dataset_id, status, created_datetime, finish_datetime, output_path FROM task WHERE user_id = ?', [userId], function (err, rows) {
                     if (err) {
                         connection.rollback(function () {
                             throw err;

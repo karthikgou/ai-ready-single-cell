@@ -124,7 +124,7 @@ const MyTasksSideNav = () => {
                                 }}
                                     onMouseEnter={(e) => { e.target.style.backgroundColor = '#f2f2f2' }} // Change background color on hover
                                     onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent' }} // Revert back to initial background color on mouse leave 
-                                    onClick={() => navigate('/resultfiles', { state: { taskId: task.task_id } })} key={index}>{task.status === 'complete' ? (
+                                    onClick={() => navigate('/resultfiles', { state: { taskId: task.task_id, output: task.output_path } })} key={index}>{task.status === 'complete' ? (
                                         <CheckCircleIcon style={{ color: 'green' }} />
                                     ) : task.status === 'fail' ? (
                                         <CancelIcon style={{ color: 'red' }} />

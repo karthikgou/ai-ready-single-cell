@@ -5,7 +5,7 @@ import { faEye, faDownload, faSquarePollVertical } from '@fortawesome/free-solid
 import FilePreviewModal from './filePreviewModal';
 import { useNavigate } from 'react-router-dom';
 
-export default function IntermediateFiles({ taskId }) {
+export default function IntermediateFiles({ taskId, output }) {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewBoxOpen, setPreviewBoxOpen] = useState(false);
@@ -15,7 +15,7 @@ export default function IntermediateFiles({ taskId }) {
 
   useEffect(() => {
     async function fetchFiles() {
-      const response = await fetch(`${SERVER_URL}/getDirContents?dirPath=${taskId}&authToken=${jwtToken}&usingFor=resultFiles`);
+      const response = await fetch(`${SERVER_URL}/getDirContents?dirPath=${taskId}&authToken=${jwtToken}`);
       const data = await response.json();
       setFiles(data.Files);
     }
@@ -37,7 +37,7 @@ export default function IntermediateFiles({ taskId }) {
     const apiUrl = `${SERVER_URL}/download`;
 
     const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
-    fetch(`${apiUrl}?fileUrl=/${taskId}/${fileUrl}&authToken=${jwtToken}&forResultFile=Yes`)
+    fetch(`${apiUrl}?fileUrl=${output}/${fileUrl}&authToken=${jwtToken}`)
       .then(response => {
         return response.blob();
       })

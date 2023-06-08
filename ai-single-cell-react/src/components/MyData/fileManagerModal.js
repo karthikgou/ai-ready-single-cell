@@ -87,12 +87,19 @@ export default function FileManagerModal({ setEnabledCheckboxes, setFileToPrevie
                 }
                 return response.json();
             })
+            .then(response => {
+                if (response.status === 409) {
+                    throw new Error('Unable to rename. File or Folder being used by dataset.');
+                }
+                return response.json();
+            })
             .catch(error => {
                 if (!errorHandled && error.message === 'Please log in first') {
                     navigate('/routing');
                     return;
-                } else {
-                    console.error(error);
+                } else if (!errorHandled && error.message === 'Unable to rename. File or Folder being used by dataset.'){
+                    setErrorMessage('Unable to rename. File or Folder being used by dataset.')
+                    return;
                 }
             });
         fetchDirContents();

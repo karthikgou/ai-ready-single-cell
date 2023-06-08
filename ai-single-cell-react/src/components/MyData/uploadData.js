@@ -121,10 +121,15 @@ export default function UploadData() {
         if (fileName.endsWith('.txt')) {
             return ['molecules', 'annotation'];
         } else if (fileName.endsWith('.tsv')) {
-            return ['genes', 'cells', 'matrix', 'features', 'count matrix'];
+            return ['genes', 'cells', 'features'];
         } else if (fileName.endsWith('.tsv.gz')) {
-            return ['genes', 'cells', 'features', 'matrix', 'count matrix'];
-        } else {
+            return ['genes', 'cells', 'features'];
+        } else if (fileName.endsWith('.mtx')) {
+            return ['matrix', 'count matrix'];
+        } else if (fileName.endsWith('.mtx.gz')) {
+            return ['matrix', 'count matrix'];
+        }
+        else {
             return [];
         }
     };
@@ -135,14 +140,21 @@ export default function UploadData() {
             return fileName;
         }
         const txt = { "molecules": "molecules.txt", "annotation": "annotation.txt" }
-        const tsv = { "cells": "barcodes.tsv", "genes": "genes.tsv", "matrix": "matrix.mtx", "features": "features.tsv", "count matrix": "count_matrix.mtx" }
-        const tsv_gz = { "cells": "barcodes.tsv.gz", "genes": "genes.tsv.gz", "matrix": "matrix.mtx.gz", "features": "features.tsv.gz", "count matrix": "count_matrix.mtx.gz" }
+        const tsv = { "cells": "barcodes.tsv", "genes": "genes.tsv", "features": "features.tsv" }
+        const tsv_gz = { "cells": "barcodes.tsv.gz", "genes": "genes.tsv.gz", "features": "features.tsv.gz" }
+        const mtx = {"matrix": "matrix.mtx", "count matrix": "count_matrix.mtx"}
+        const mtx_gz = {"matrix": "matrix.mtx.gz", "count matrix": "count_matrix.mtx.gz"}
+
         if (fileName.endsWith('.txt')) {
             return txt[fileType];
         } else if (fileName.endsWith('.tsv')) {
             return tsv[fileType];
         } else if (fileName.endsWith('.tsv.gz')) {
             return tsv_gz[fileType];
+        } else if (fileName.endsWith('.mtx')) {
+            return mtx[fileType];
+        } else if (fileName.endsWith('.mtx.gz')) {
+            return mtx_gz[fileType];
         }
     };
 
@@ -176,7 +188,7 @@ export default function UploadData() {
         else
             newDir = pwd
 
-        fetch(`${SERVER_URL}/getDirContents?dirPath=${newDir}&authToken=${jwtToken}&usingFor=userstorage`)
+        fetch(`${SERVER_URL}/getDirContents?dirPath=${newDir}&authToken=${jwtToken}`)
             .then(response => {
                 if (response.status === 403) {
                     throw new Error('Please log in first');
@@ -318,7 +330,7 @@ export default function UploadData() {
             </div>
             <div className="main-content">
                 {(errorMessage !== '') && (
-                    <div className='message-box' style={{ backgroundColor: 'lightpink' }}>
+                    <div className='message-box' style={{ backgroundColor: 'lightpink', zIndex: 9999 }}>
                         <div style={{ textAlign: 'center' }}>
                             <p>{errorMessage}</p>
                             <div style={{ position: "absolute", right: "12px", top: "20px", cursor: "pointer" }}>
@@ -337,7 +349,6 @@ export default function UploadData() {
                                 <p>
                                     Accepted Formats for Single-file Datasets: csv, tsv, txt, txt.gz, h5ad
                                 </p>
-                                <br />
                                 <p>
                                     Standard File Structure for Multi-file Datasets:
                                 </p>
@@ -356,7 +367,7 @@ export default function UploadData() {
                     <div>        <div>
                         <div id="upload-data-div">
                             <div className="info-icon" onClick={() => { setIsInfoModalOpen(true); }}>
-                            <FontAwesomeIcon icon={faInfoCircle} size="1.2x" />
+                                <FontAwesomeIcon icon={faInfoCircle} size="1.2x" />
                             </div>
                             <b>Choose your files *</b> <br />
                             <div id="files-selected">

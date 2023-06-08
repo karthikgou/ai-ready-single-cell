@@ -1001,7 +1001,7 @@ CREATE TABLE `task` (
   `status` varchar(15) DEFAULT NULL,
   `created_datetime` BIGINT UNSIGNED DEFAULT NULL,
   `finish_datetime` BIGINT UNSIGNED DEFAULT NULL,
-  `output_path` varchar(100) NOT NULL, 
+  `output_path` varchar(255) NOT NULL, 
   PRIMARY KEY (`task_id`),
   KEY `user_id_fk_idx` (`user_id`),
   KEY `dataset_id_fk_idx` (`dataset_id`),
