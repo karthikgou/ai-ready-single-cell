@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleUp, faCheck, faDownload, faFile, faFolder, faFolderOpen, faPencil, faPlus, faRefresh, faTrash, faTurnUp, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ModalWindow.css';
 import { red } from "@mui/material/colors";
 import { getCookie } from '../utils/utilFunctions';
@@ -9,7 +10,6 @@ import Form from "@rjsf/core";
 
 import schema from "./uploadDataSchema.json";
 import RightRail from "./rightRail";
-import LeftNav from "./leftNav";
 
 export default function UploadData() {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
@@ -27,6 +27,17 @@ export default function UploadData() {
     const [totalStorage, setTotalStorage] = useState(1);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [enabledCheckboxes, setEnabledCheckboxes] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [fileListBuffer, setFileListBuffer] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setErrorMessage('');
+        }, 5000);
+        // Return a cleanup function to cancel the timeout when the component unmounts
+        return () => clearTimeout(timeoutId);
+    }, [errorMessage]);
 
     const handleRenameIcon = (id) => {
         fileNames.map((item, index) => {
@@ -64,13 +75,13 @@ export default function UploadData() {
     }, [isUppyModalOpen]);
 
     async function pushOrPopName(name) {
-        console.log('filesSelected: ' + selectedFiles);
+        console.log('filesSelected: ' + fileListBuffer);
         name = name.replace("//", "/");
-        if (!selectedFiles.includes(name)) {
-            selectedFiles.push(name);
+        if (!fileListBuffer.includes(name)) {
+            fileListBuffer.push(name);
         }
         else
-            selectedFiles.pop(name)
+            fileListBuffer.pop(name)
     }
 
     const handleUpdateText = (id, newText) => {
@@ -93,9 +104,11 @@ export default function UploadData() {
     const toggleModal = async () => {
         await setIsFileManagerOpen(!isFileManagerOpen);
 
+        setSelectedFiles(fileListBuffer);
 
         if (!isFileManagerOpen) {
             setSelectedFiles([]);
+            setFileListBuffer([]);
             fetchDirContents();
         }
     }
@@ -117,7 +130,7 @@ export default function UploadData() {
             })
             .catch(error => {
                 if (!errorHandled && error.message === 'Please log in first') {
-                    window.alert('Please log in first');
+                    navigate('/routing');
                     return;
                 } else {
                     console.error(error);
@@ -159,7 +172,7 @@ export default function UploadData() {
             .catch(error => {
                 setIsFileManagerOpen(false);
                 if (error.message === 'Please log in first') {
-                    window.alert('Please log in first');
+                    navigate('/routing');
                 } else {
                     console.error(error);
                 }
@@ -183,7 +196,7 @@ export default function UploadData() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ fileList: selectedFiles })
+            body: JSON.stringify({ fileList: fileListBuffer })
         })
             .then(response => {
                 if (response.status === 403) {
@@ -197,21 +210,20 @@ export default function UploadData() {
             .then(response => response.json())
             .then(response => {
                 if (response.errorCount > 0) {
-                    window.alert(`Failed to delete ${response.errorCount} file(s).`)
+                    setErrorMessage(`Failed to delete ${response.errorCount} file(s).`);
                 }
             })
             .catch(error => {
                 if (error.message === 'Access denied. Please log in.') {
-                    // display dialog box for access denied error
-                    alert('Access denied. Please log in.');
+                    navigate('/routing');
                 }
                 else if (error.message === 'File(s) being used by datasets.') {
-                    alert('Unable to delete. File(s) being used by datasets.');
+                    setErrorMessage('Delete failed. File(s) being used by datasets.');
                 } else {
                     console.log('Error deleting file: ', error);
                 }
             });
-        setSelectedFiles([]);
+        setFileListBuffer([]);
         fetchDirContents();
     }
 
@@ -228,7 +240,7 @@ export default function UploadData() {
             })
             .catch(error => {
                 if (error.message === 'Please log in first') {
-                    window.alert('Please log in first');
+                    navigate('/routing');
                 } else {
                     console.error(error);
                 }
@@ -247,8 +259,8 @@ export default function UploadData() {
         const apiUrl = `${SERVER_URL}/download`;
 
         // If fileUrl is not empty, call the API with fileUrl as query parameter
-        if (selectedFiles.length == 1) {
-            const fileUrl = selectedFiles[0]
+        if (fileListBuffer.length == 1) {
+            const fileUrl = fileListBuffer[0]
             const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
             fetch(`${apiUrl}?fileUrl=${fileUrl}&authToken=${jwtToken}`)
                 .then(response => {
@@ -270,13 +282,13 @@ export default function UploadData() {
                 });
         }
 
-        else if (selectedFiles.length > 1) {
+        else if (fileListBuffer.length > 1) {
             fetch(`${apiUrl}?authToken=${jwtToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ fileList: selectedFiles })
+                body: JSON.stringify({ fileList: fileListBuffer })
             })
                 .then(response => {
                     return response.blob();
@@ -297,13 +309,35 @@ export default function UploadData() {
 
     }
 
+    function createNewFolder(folderName) {
+        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${folderName}&authToken=${jwtToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (response.status === 403) {
+                    throw new Error('Please log in first');
+                }
+                setIsNewDirOn(false);
+                fetchDirContents();
+                return response.json();
+            })
+            .catch(error => {
+                navigate('/routing');
+                console.error(error);
+                return;
+            });
+    }
+
     const handleSubmit = (event) => {
         if (selectedFiles === undefined || selectedFiles.length === 0) {
-            window.alert('Select at least one file.');
+            setErrorMessage('Select at least one file.');
             return;
         }
         else if (jwtToken === undefined || jwtToken.length === 0) {
-            window.alert('Select at least one file.');
+            setErrorMessage('Please log in first.');
             return;
         }
         formData['authToken'] = jwtToken;
@@ -317,14 +351,13 @@ export default function UploadData() {
         })
             .then(response => {
                 if (response.status === 201) {
-                    alert('Dataset created successfully.');
-                    window.location.reload();
+                    navigate('/mydata/preview-datasets', { state: { message: 'Dataset created successfully.' } });
                 } else {
                     console.log('Error creating dataset:', response);
                 }
             })
             .catch(error => {
-                alert('Error creating dataset.');
+                setErrorMessage('Error creating dataset.');
                 console.error('Error creating dataset:', error);
             });
         setIsButtonDisabled(true);
@@ -333,12 +366,22 @@ export default function UploadData() {
         }, 5000);
     };
 
-    return (
+    if (jwtToken === '' || jwtToken === undefined) {
+        navigate("/routing");
+    }
+
+    else return (
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
+                {(errorMessage !== '') && (
+                    <div className='message-box' style={{ backgroundColor: 'lightpink' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <p>{errorMessage}</p>
+                        </div>
+                    </div>)}
                 <div className="main-content">
                     <h2 style={{ textAlign: "left" }}><span>Input</span></h2>
                     <div>        <div>
@@ -389,6 +432,8 @@ export default function UploadData() {
                                                             if (event.key === 'Enter') {
                                                                 handleUpdateText(`d${index}`, event.target.value);
                                                             }
+                                                        }} onBlur={(event) => {
+                                                            handleUpdateText(`d${index}`, event.target.value);
                                                         }}
                                                             autoFocus
                                                         />
@@ -423,31 +468,23 @@ export default function UploadData() {
                                                         <div style={{ paddingLeft: '5%', width: "25%" }}>{file.created}</div>
                                                     </div>
                                                 ))}
-                                                {isNewDirOn && (<div class="modal-item"><input type="text" defaultValue="New Folder" onKeyDown={(event) => {
-                                                    if (event.key === 'Enter') {
-                                                        fetch(`${SERVER_URL}/createNewFolder?pwd=${pwd}&folderName=${event.target.value}&authToken=${jwtToken}`, {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json'
-                                                            },
-                                                        })
-                                                            .then(response => {
-                                                                if (response.status === 403) {
-                                                                    throw new Error('Please log in first');
+                                                {isNewDirOn && (
+                                                    <div className="modal-item">
+                                                        <input
+                                                            type="text"
+                                                            defaultValue="New Folder"
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === 'Enter') {
+                                                                    createNewFolder(event.target.value);
                                                                 }
-                                                                setIsNewDirOn(false);
-                                                                fetchDirContents();
-                                                                return response.json();
-                                                            })
-                                                            .catch(error => {
-                                                                window.alert('Please log in first');
-                                                                console.error(error);
-                                                                return;
-                                                            });
-                                                    }
-                                                }}
-                                                    autoFocus
-                                                /></div>)}
+                                                            }}
+                                                            onBlur={(event) => {
+                                                                createNewFolder(event.target.value);
+                                                            }}
+                                                            autoFocus
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

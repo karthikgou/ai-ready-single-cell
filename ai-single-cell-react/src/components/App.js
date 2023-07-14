@@ -20,6 +20,9 @@ import Team from './../pages/team'
 import Docs from './../pages/docs'
 import PreviewDatasets from './../pages/previewDatasets'
 import UploadData from './uploadData';
+import LoginPage from '../pages/login/login';
+import Signup from '../pages/login/signup';
+import RoutingTemplate from '../pages/login/loginRouting';
 
 function App() {
 
@@ -37,6 +40,9 @@ function App() {
           <Route path="mydata/preview-datasets" element={<PreviewDatasets/>}></Route>
           <Route path="team"         element={<Team/>}/>
           <Route path="docs"         element={<Docs/>}/>
+          <Route path="login"         element={<LoginPage/>}/>
+          <Route path="signup"         element={<Signup/>}/>
+          <Route path="routing"         element={<RoutingTemplate/>}/>
         </Route>
       </Routes>
     </BrowserRouter>

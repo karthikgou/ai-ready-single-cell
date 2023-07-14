@@ -193,37 +193,6 @@ app.post('/createDataset', (req, res) => {
                     return;
                 }
 
-
-                // Run INSERT command
-                // connection.query('INSERT INTO dataset (title, n_cells, reference, summary, user_id) VALUES (?, ?, ?, ?, ?)', [title, n_cells, reference, summary, userId], function (err, datasetResult) {
-                //     if (err) {
-                //         connection.rollback(function () {
-                //             throw err;
-                //         });
-                //     }
-
-                //     if(datasetResult === undefined) {
-                //         return res.status(400).jsonp('Bad request');
-                //     }
-                //     const datasetId = datasetResult.insertId;
-
-                //     for (const file of files) {
-                //         connection.query('INSERT INTO file (file_loc, dataset_id) VALUES (?, ?)', [file, datasetId]);
-                //     }
-
-                //     // Commit transaction
-                //     connection.commit(function (err) {
-                //         if (err) {
-                //             connection.rollback(function () {
-                //                 throw err;
-                //             });
-                //         }
-
-                //         console.log('Transaction completed successfully');
-                //         connection.release();
-                //         res.status(201).jsonp('Dataset Created.');
-                //     });
-                // });
                 connection.query('INSERT INTO dataset (title, n_cells, reference, summary, user_id) VALUES (?, ?, ?, ?, ?)', [title, n_cells, reference, summary, userId], function (err, datasetResult) {
                     if (err) {
                         if (err.code === 'ER_DUP_ENTRY') {

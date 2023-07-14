@@ -1,17 +1,16 @@
-import LeftNav from "../components/leftNav";
-import RightRail from "../components/rightRail";
+import UserRouting from "../../components/userRouting";
 
-export default function Login() {
+export default function RoutingTemplate() {
     return(
         <div className="page-container">
             <div className="left-nav">
-                <LeftNav />
+                {/* <LeftNav /> */}
             </div>
             <div className="main-content">
-                <h1>I'm inside login page</h1>
+                <UserRouting />
             </div>
             <div className="right-rail">
-                <RightRail />
+                {/* <RightRail /> */}
             </div>
         </div>
     )
