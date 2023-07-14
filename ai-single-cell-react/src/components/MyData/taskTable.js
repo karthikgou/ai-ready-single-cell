@@ -181,7 +181,7 @@ const TaskTable = () => {
                                     )}
                                 </TableCell>
                                 {task.status ? (
-                                    <TableCell><a onClick={() => navigate('/resultfiles', { state: { taskId: task.task_id } })}>View</a></TableCell>
+                                    <TableCell><a onClick={() => navigate('/resultfiles', { state: { taskId: task.task_id, output: task.output_path } })}>View</a></TableCell>
                                 ) : (
                                     <TableCell></TableCell>
                                 )}
